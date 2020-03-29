@@ -1,2 +1,2 @@
 ## Infrastructure Provisioning Design [draft]
-![alt text](InfrastructureAWS/InitialInfrastructureProposal.png)
+![alt text](rmit-project/InfrastructureAWS/InitialInfrastructureProposal.png)
