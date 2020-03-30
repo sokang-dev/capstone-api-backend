@@ -9,10 +9,10 @@ pipelines:
   pull-requests:
     '**':
       - step:
-        name: Build and run tests
-        caches:
-          - node
-        script:
-          - cd OneTimePasswordGenerator
-          - npm install
-          - npm test
+          name: Build and run tests
+          caches:
+            - node
+          script:
+            - cd OneTimePasswordGenerator
+            - npm install
+            - npm test
