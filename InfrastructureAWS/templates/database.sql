@@ -21,6 +21,8 @@ CREATE TABLE application
 	id INT NOT NULL AUTO_INCREMENT,
 	application_name VARCHAR(255) NOT NULL,
 	account_id INT NOT NULL,
+	otp_length INT NOT NULL DEFAULT 6,
+	otp_lifetime INT NOT NULL DEFAULT 60,
   created_date DATETIME,
   modified_date DATETIME,
 	CONSTRAINT application_pk PRIMARY KEY (id),
