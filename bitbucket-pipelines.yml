@@ -9,7 +9,7 @@ pipelines:
   pull-requests:
     '**':
       - step:
-          name: Build and run tests
+        name: Build and run tests
           caches:
             - node
           script:
