@@ -51,18 +51,6 @@ export class AccountController {
     return this.accountRepository.create(account);
   }
 
-  @get('/accounts/count', {
-    responses: {
-      '200': {
-        description: 'Account model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async count(@param.where(Account) where?: Where<Account>): Promise<Count> {
-    return this.accountRepository.count(where);
-  }
-
   @get('/accounts', {
     responses: {
       '200': {
@@ -82,28 +70,6 @@ export class AccountController {
     @param.filter(Account) filter?: Filter<Account>,
   ): Promise<Account[]> {
     return this.accountRepository.find(filter);
-  }
-
-  @patch('/accounts', {
-    responses: {
-      '200': {
-        description: 'Account PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Account, {partial: true}),
-        },
-      },
-    })
-    account: Account,
-    @param.where(Account) where?: Where<Account>,
-  ): Promise<Count> {
-    return this.accountRepository.updateAll(account, where);
   }
 
   @get('/accounts/{id}', {
