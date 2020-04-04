@@ -44,13 +44,9 @@ export class AccountController {
     })
     account: Omit<Account, 'id'>,
   ): Promise<Account> {
-    let accountWithHashPassword = Object.assign({}, account);
     // Hash password
-    accountWithHashPassword.password = bcrypt.hashSync(
-      account.password,
-      this.saltRounds,
-    );
-    return this.accountRepository.create(accountWithHashPassword);
+    account.password = bcrypt.hashSync(account.password, this.saltRounds);
+    return this.accountRepository.create(account);
   }
 
   @get('/accounts', {
@@ -112,6 +108,13 @@ export class AccountController {
     })
     account: Account,
   ): Promise<void> {
+    console.log(account);
+    // If password is being updated
+    if (account.password) {
+      // Hash password
+      account.password = bcrypt.hashSync(account.password, this.saltRounds);
+    }
+
     await this.accountRepository.updateById(id, account);
   }
 
