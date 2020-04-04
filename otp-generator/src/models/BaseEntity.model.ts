@@ -21,5 +21,5 @@ export abstract class BaseEntity extends Entity {
       nullable: 'Y',
     },
   })
-  modifiedDate?: Date;
+  public modifiedDate?: Date;
 }
