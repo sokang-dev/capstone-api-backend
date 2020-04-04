@@ -8,6 +8,7 @@ import {
   put,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
 const bcrypt = require('bcrypt');
 
@@ -26,7 +27,7 @@ export class AccountController {
   @post('/accounts/register', {
     responses: {
       '200': {
-        description: 'Account model instance',
+        description: 'Register successful',
         content: {'application/json': {schema: getModelSchemaRef(Account)}},
       },
     },
@@ -47,6 +48,43 @@ export class AccountController {
     // Hash password
     account.password = bcrypt.hashSync(account.password, this.saltRounds);
     return this.accountRepository.create(account);
+  }
+
+  @post('/accounts/login', {
+    responses: {
+      '200': {
+        description: 'Login successful',
+        content: {
+          'application/json': {
+            schema: {
+              username: 'string',
+            },
+          },
+        },
+      },
+    },
+  })
+  async login(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {username: 'string', password: 'string'},
+        },
+      },
+    })
+    account: Account,
+  ): Promise<void> {
+    const exists = await this.accountRepository.findOne({
+      where: {username: account.username},
+    });
+
+    if (exists) {
+      if (!bcrypt.compareSync(account.password, exists.password)) {
+        throw new HttpErrors.Unauthorized('Incorrect login credentials');
+      }
+    } else {
+      throw new HttpErrors.Unauthorized('Incorrect login credentials');
+    }
   }
 
   @get('/accounts', {
