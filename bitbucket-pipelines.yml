@@ -13,6 +13,6 @@ pipelines:
           caches:
             - node
           script:
-            - cd OneTimePasswordGenerator
+            - cd otp-generator
             - npm install
-            - npm test
+            - npm run test # triggers clean and build before running the tests
