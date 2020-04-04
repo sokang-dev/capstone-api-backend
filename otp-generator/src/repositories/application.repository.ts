@@ -31,4 +31,23 @@ export class ApplicationRepository extends DefaultCrudRepository<
       accountRepositoryGetter,
     );
   }
+
+  // Update modifiedDate property when model is about to be updated
+  definePersistedModel(entityClass: typeof Application) {
+    const application = super.definePersistedModel(entityClass);
+
+    application.observe('before save', async ctx => {
+      // When it is a full update
+      if (ctx.instance) {
+        ctx.instance.modifiedDate = new Date();
+      }
+
+      // When it is a partial update
+      else {
+        ctx.data.modifiedDate = new Date();
+      }
+    });
+
+    return application;
+  }
 }
