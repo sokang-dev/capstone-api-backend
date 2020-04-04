@@ -1,5 +1,5 @@
 import {model, property, belongsTo} from '@loopback/repository';
-import {BaseEntity} from './BaseEntity.model';
+import {TimestampEntity} from './TimestampEntity.model';
 import {Account} from './account.model';
 
 @model({
@@ -8,7 +8,7 @@ import {Account} from './account.model';
     mysql: {schema: 'otpgen', table: 'application'},
   },
 })
-export class Application extends BaseEntity {
+export class Application extends TimestampEntity {
   @property({
     type: 'number',
     required: false,

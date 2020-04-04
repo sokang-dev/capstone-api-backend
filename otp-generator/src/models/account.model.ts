@@ -1,11 +1,11 @@
 import {model, property} from '@loopback/repository';
 
-import {BaseEntity} from './BaseEntity.model';
+import {TimestampEntity} from './TimestampEntity.model';
 
 @model({
   settings: {idInjection: false, mysql: {schema: 'otpgen', table: 'account'}},
 })
-export class Account extends BaseEntity {
+export class Account extends TimestampEntity {
   @property({
     type: 'number',
     required: false,

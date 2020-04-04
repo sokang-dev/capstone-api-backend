@@ -1,6 +1,6 @@
 import {Entity, property} from '@loopback/repository';
 
-export abstract class BaseEntity extends Entity {
+export abstract class TimestampEntity extends Entity {
   @property({
     type: 'date',
     default: () => new Date(),
