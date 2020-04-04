@@ -20,11 +20,11 @@ export class AccountRepository extends DefaultCrudRepository<
 
   constructor(
     @inject('datasources.OtpgenDb') dataSource: OtpgenDbDataSource,
-    @repository.getter(ApplicationRepository)
+    @repository.getter('ApplicationRepository')
     applicationRepositoryGetter: Getter<ApplicationRepository>,
   ) {
     super(Account, dataSource);
-    this.applications = this._createHasManyRepositoryFactoryFor(
+    this.applications = this.createHasManyRepositoryFactoryFor(
       'applications',
       applicationRepositoryGetter,
     );

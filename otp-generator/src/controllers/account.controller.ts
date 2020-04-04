@@ -1,11 +1,4 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where,
-} from '@loopback/repository';
+import {Filter, FilterExcludingWhere, repository} from '@loopback/repository';
 import {
   post,
   param,
@@ -16,6 +9,8 @@ import {
   del,
   requestBody,
 } from '@loopback/rest';
+const bcrypt = require('bcrypt');
+
 import {Account} from '../models';
 import {AccountRepository} from '../repositories';
 
@@ -25,7 +20,10 @@ export class AccountController {
     public accountRepository: AccountRepository,
   ) {}
 
-  @post('/accounts', {
+  // Use for hashing password
+  saltRounds = 10;
+
+  @post('/accounts/register', {
     responses: {
       '200': {
         description: 'Account model instance',
@@ -33,7 +31,7 @@ export class AccountController {
       },
     },
   })
-  async create(
+  async register(
     @requestBody({
       content: {
         'application/json': {
@@ -46,7 +44,13 @@ export class AccountController {
     })
     account: Omit<Account, 'id'>,
   ): Promise<Account> {
-    return this.accountRepository.create(account);
+    let accountWithHashPassword = Object.assign({}, account);
+    // Hash password
+    accountWithHashPassword.password = bcrypt.hashSync(
+      account.password,
+      this.saltRounds,
+    );
+    return this.accountRepository.create(accountWithHashPassword);
   }
 
   @get('/accounts', {
