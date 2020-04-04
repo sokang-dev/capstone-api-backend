@@ -4,7 +4,11 @@ import {TimestampEntity} from './TimestampEntity.model';
 import {Application, ApplicationWithRelations} from './application.model';
 
 @model({
-  settings: {idInjection: false, mysql: {schema: 'otpgen', table: 'account'}},
+  settings: {
+    idInjection: false,
+    hiddenProperties: ['password'],
+    mysql: {schema: 'otpgen', table: 'account'},
+  },
 })
 export class Account extends TimestampEntity {
   @property({
