@@ -1,6 +1,6 @@
 import {model, property, belongsTo} from '@loopback/repository';
 import {TimestampEntity} from './TimestampEntity.model';
-import {Account} from './account.model';
+import {Account, AccountWithRelations} from './account.model';
 
 @model({
   settings: {
@@ -83,19 +83,13 @@ export class Application extends TimestampEntity {
   })
   otpLifetime: number;
 
-  // Define well-known properties here
-
-  // Indexer property to allow additional data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [prop: string]: any;
-
   constructor(data?: Partial<Application>) {
     super(data);
   }
 }
 
 export interface ApplicationRelations {
-  // describe navigational properties here
+  account: AccountWithRelations;
 }
 
 export type ApplicationWithRelations = Application & ApplicationRelations;
