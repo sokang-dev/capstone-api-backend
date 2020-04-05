@@ -24,6 +24,7 @@ export class AccountController {
   // Use for hashing password
   saltRounds = 10;
 
+  // Register account
   @post('/accounts/register', {
     responses: {
       '200': {
@@ -50,6 +51,7 @@ export class AccountController {
     return this.accountRepository.create(account);
   }
 
+  // Login account
   @post('/accounts/login', {
     responses: {
       '200': {
@@ -87,6 +89,7 @@ export class AccountController {
     }
   }
 
+  // Get all accounts
   @get('/accounts', {
     responses: {
       '200': {
@@ -108,6 +111,7 @@ export class AccountController {
     return this.accountRepository.find(filter);
   }
 
+  // Get account by id
   @get('/accounts/{id}', {
     responses: {
       '200': {
@@ -128,6 +132,7 @@ export class AccountController {
     return this.accountRepository.findById(id, filter);
   }
 
+  // Partial update account by id
   @patch('/accounts/{id}', {
     responses: {
       '204': {
@@ -156,6 +161,7 @@ export class AccountController {
     await this.accountRepository.updateById(id, account);
   }
 
+  // Full update account by id
   @put('/accounts/{id}', {
     responses: {
       '204': {
