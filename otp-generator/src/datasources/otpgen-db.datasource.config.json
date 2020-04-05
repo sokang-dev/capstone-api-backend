@@ -1,5 +1,5 @@
 {
-  "name": "OtpgenDb",
+  "name": "db",
   "connector": "mysql",
   "url": "DB_URL",
   "host": "DB_HOST",

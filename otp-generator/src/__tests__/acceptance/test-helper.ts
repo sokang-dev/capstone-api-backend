@@ -6,7 +6,7 @@ import {
 
 import {OtpGeneratorApplication} from '../..';
 import {AccountRepository, ApplicationRepository} from '../../repositories';
-import {TestDbDataSource} from '../../datasources';
+import {testdb} from '../datasources/test-db.datasource';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const restConfig = givenHttpServerConfig({
@@ -22,6 +22,12 @@ export async function setupApplication(): Promise<AppWithClient> {
   });
 
   await app.boot();
+
+  app.bind('datasources.config.db').to({
+    name: 'db',
+    connector: 'memory',
+  });
+
   await app.start();
 
   const client = createRestAppClient(app);
@@ -29,23 +35,20 @@ export async function setupApplication(): Promise<AppWithClient> {
   return {app, client};
 }
 
-export async function cleanTestDb() {
+export async function givenEmptyDb() {
   let accountRepository: AccountRepository;
   let applicationRepository: ApplicationRepository;
 
   accountRepository = new AccountRepository(
-    new TestDbDataSource(),
+    testdb,
     async () => applicationRepository,
   );
   applicationRepository = new ApplicationRepository(
-    new TestDbDataSource(),
+    testdb,
     async () => accountRepository,
   );
 
-  await Promise.all([
-    accountRepository.deleteAll(),
-    applicationRepository.deleteAll(),
-  ]);
+  await accountRepository.deleteAll();
 }
 
 // export async function seedTestDb() {

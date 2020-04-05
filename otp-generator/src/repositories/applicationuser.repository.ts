@@ -24,7 +24,7 @@ export class ApplicationuserRepository extends DefaultCrudRepository<
   >;
 
   constructor(
-    @inject('datasources.OtpgenDb') dataSource: juggler.DataSource,
+    @inject('datasources.db') dataSource: juggler.DataSource,
     @repository.getter(ApplicationRepository)
     applicationRepositoryGetter: Getter<ApplicationRepository>,
   ) {

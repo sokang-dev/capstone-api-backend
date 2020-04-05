@@ -2,12 +2,11 @@ import {inject, lifeCycleObserver, ValueOrPromise} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 import config from './otpgen-db.datasource.config.json';
 
-@lifeCycleObserver('datasource')
 export class OtpgenDbDataSource extends juggler.DataSource {
-  static dataSourceName = 'OtpgenDb';
+  static dataSourceName = 'db';
 
   constructor(
-    @inject('datasources.config.OtpgenDb', {optional: true})
+    @inject('datasources.config.db', {optional: true})
     dsConfig: object = config,
   ) {
     // Override datesource config from environment variables
@@ -21,9 +20,5 @@ export class OtpgenDbDataSource extends juggler.DataSource {
     });
 
     super(dsConfig);
-  }
-
-  stop(): ValueOrPromise<void> {
-    return super.disconnect();
   }
 }

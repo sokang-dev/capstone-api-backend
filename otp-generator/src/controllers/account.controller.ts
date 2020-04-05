@@ -39,7 +39,6 @@ export class AccountController {
         'application/json': {
           schema: getModelSchemaRef(Account, {
             title: 'NewAccount',
-            exclude: ['id'],
           }),
         },
       },
