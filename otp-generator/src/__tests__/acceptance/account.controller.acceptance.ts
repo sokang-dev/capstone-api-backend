@@ -28,13 +28,9 @@ describe('AccountController', () => {
     console.log(req);
 
     // Act
-    const res = await client
-      .post('/accounts/register')
-      .send({username: '1234', password: '213', apikey: '123'})
-      .expect(200);
+    const res = await client.post('/accounts/register').send(req).expect(200);
 
     // Assert
-    // expect(res).to.have.status(200);
-    // expect(res.body.username).to.equal('john217');
+    expect(res.body.username).to.equal('john217');
   });
 });

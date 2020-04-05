@@ -5,7 +5,6 @@ import {
   juggler,
 } from '@loopback/repository';
 import {Account, AccountRelations, Application} from '../models';
-import {OtpgenDbDataSource} from '../datasources';
 import {inject, Getter} from '@loopback/core';
 import {ApplicationRepository} from './application.repository';
 

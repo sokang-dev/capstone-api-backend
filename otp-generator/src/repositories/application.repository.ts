@@ -7,7 +7,6 @@ import {
 import {inject, Getter} from '@loopback/core';
 
 import {Application, ApplicationRelations, Account} from '../models';
-import {OtpgenDbDataSource} from '../datasources';
 import {AccountRepository} from './account.repository';
 
 export class ApplicationRepository extends DefaultCrudRepository<

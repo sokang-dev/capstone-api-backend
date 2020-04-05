@@ -1,4 +1,4 @@
-import {inject, lifeCycleObserver, ValueOrPromise} from '@loopback/core';
+import {inject} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 import config from './otpgen-db.datasource.config.json';
 

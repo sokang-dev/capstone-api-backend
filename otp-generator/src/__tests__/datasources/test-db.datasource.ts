@@ -1,4 +1,3 @@
-import {inject, ValueOrPromise, lifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 
 export const testdb: juggler.DataSource = new juggler.DataSource({
