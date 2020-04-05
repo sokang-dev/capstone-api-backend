@@ -1,7 +1,8 @@
-import {inject} from '@loopback/core';
+import {inject, lifeCycleObserver, ValueOrPromise} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 import config from './otpgen-db.datasource.config.json';
 
+@lifeCycleObserver('datasource')
 export class OtpgenDbDataSource extends juggler.DataSource {
   static dataSourceName = 'OtpgenDb';
 
@@ -20,5 +21,9 @@ export class OtpgenDbDataSource extends juggler.DataSource {
     });
 
     super(dsConfig);
+  }
+
+  stop(): ValueOrPromise<void> {
+    return super.disconnect();
   }
 }
