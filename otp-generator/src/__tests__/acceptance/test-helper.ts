@@ -1,9 +1,10 @@
-import {OtpGeneratorApplication} from '../..';
 import {
   createRestAppClient,
   givenHttpServerConfig,
   Client,
 } from '@loopback/testlab';
+
+import {OtpGeneratorApplication} from '../..';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const restConfig = givenHttpServerConfig({
@@ -19,8 +20,14 @@ export async function setupApplication(): Promise<AppWithClient> {
   });
 
   await app.boot();
-  await app.start();
 
+  // Bind to testing db
+  app.bind('datasources.config.db').to({
+    name: 'db',
+    connector: 'memory',
+  });
+
+  await app.start();
   const client = createRestAppClient(app);
 
   return {app, client};

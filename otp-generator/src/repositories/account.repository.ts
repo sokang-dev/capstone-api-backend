@@ -1,15 +1,33 @@
-import {DefaultCrudRepository} from '@loopback/repository';
-import {Account, AccountRelations} from '../models';
-import {OtpgenDbDataSource} from '../datasources';
-import {inject} from '@loopback/core';
+import {
+  DefaultCrudRepository,
+  HasManyRepositoryFactory,
+  repository,
+  juggler,
+} from '@loopback/repository';
+import {Account, AccountRelations, Application} from '../models';
+import {inject, Getter} from '@loopback/core';
+import {ApplicationRepository} from './application.repository';
 
 export class AccountRepository extends DefaultCrudRepository<
   Account,
   typeof Account.prototype.id,
   AccountRelations
 > {
-  constructor(@inject('datasources.OtpgenDb') dataSource: OtpgenDbDataSource) {
+  public readonly applications: HasManyRepositoryFactory<
+    Application,
+    typeof Account.prototype.id
+  >;
+
+  constructor(
+    @inject('datasources.db') dataSource: juggler.DataSource,
+    @repository.getter('ApplicationRepository')
+    applicationRepositoryGetter: Getter<ApplicationRepository>,
+  ) {
     super(Account, dataSource);
+    this.applications = this.createHasManyRepositoryFactoryFor(
+      'applications',
+      applicationRepositoryGetter,
+    );
   }
 
   // Update modifiedDate property when model is about to be updated

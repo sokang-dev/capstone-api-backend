@@ -2,14 +2,15 @@ import {
   DefaultCrudRepository,
   repository,
   BelongsToAccessor,
+  juggler,
 } from '@loopback/repository';
+import {inject, Getter} from '@loopback/core';
+
 import {
   Applicationuser,
   ApplicationuserRelations,
   Application,
 } from '../models';
-import {OtpgenDbDataSource} from '../datasources';
-import {inject, Getter} from '@loopback/core';
 import {ApplicationRepository} from './application.repository';
 
 export class ApplicationuserRepository extends DefaultCrudRepository<
@@ -23,7 +24,7 @@ export class ApplicationuserRepository extends DefaultCrudRepository<
   >;
 
   constructor(
-    @inject('datasources.OtpgenDb') dataSource: OtpgenDbDataSource,
+    @inject('datasources.db') dataSource: juggler.DataSource,
     @repository.getter(ApplicationRepository)
     applicationRepositoryGetter: Getter<ApplicationRepository>,
   ) {

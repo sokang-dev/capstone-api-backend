@@ -3,10 +3,10 @@ import {juggler} from '@loopback/repository';
 import config from './otpgen-db.datasource.config.json';
 
 export class OtpgenDbDataSource extends juggler.DataSource {
-  static dataSourceName = 'OtpgenDb';
+  static dataSourceName = 'db';
 
   constructor(
-    @inject('datasources.config.OtpgenDb', {optional: true})
+    @inject('datasources.config.db', {optional: true})
     dsConfig: object = config,
   ) {
     // Override datesource config from environment variables

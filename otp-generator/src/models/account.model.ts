@@ -1,9 +1,14 @@
-import {model, property} from '@loopback/repository';
+import {model, property, hasMany} from '@loopback/repository';
 
 import {TimestampEntity} from './TimestampEntity.model';
+import {Application, ApplicationWithRelations} from './application.model';
 
 @model({
-  settings: {idInjection: false, mysql: {schema: 'otpgen', table: 'account'}},
+  settings: {
+    idInjection: false,
+    hiddenProperties: ['password'],
+    mysql: {schema: 'otpgen', table: 'account'},
+  },
 })
 export class Account extends TimestampEntity {
   @property({
@@ -68,11 +73,8 @@ export class Account extends TimestampEntity {
   })
   apikey: string;
 
-  // Define well-known properties here
-
-  // Indexer property to allow additional data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [prop: string]: any;
+  @hasMany(() => Application)
+  applications?: Application[];
 
   constructor(data?: Partial<Account>) {
     super(data);
@@ -80,7 +82,7 @@ export class Account extends TimestampEntity {
 }
 
 export interface AccountRelations {
-  // describe navigational properties here
+  applications: ApplicationWithRelations[];
 }
 
 export type AccountWithRelations = Account & AccountRelations;
