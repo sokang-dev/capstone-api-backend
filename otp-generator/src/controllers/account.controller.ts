@@ -10,7 +10,7 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-const bcrypt = require('bcrypt');
+import * as bcrypt from 'bcrypt';
 
 import {Account} from '../models';
 import {AccountRepository} from '../repositories';
