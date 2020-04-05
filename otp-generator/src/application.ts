@@ -17,6 +17,9 @@ export class OtpGeneratorApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
+    // Set up API base path
+    this.basePath('/api');
+
     // Set up the custom sequence
     this.sequence(MySequence);
 
