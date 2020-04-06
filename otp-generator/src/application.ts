@@ -8,7 +8,6 @@ import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
-import * as dotenv from 'dotenv';
 
 import {MySequence} from './sequence';
 
@@ -17,6 +16,9 @@ export class OtpGeneratorApplication extends BootMixin(
 ) {
   constructor(options: ApplicationConfig = {}) {
     super(options);
+
+    // Set up API base path
+    this.basePath('/api');
 
     // Set up the custom sequence
     this.sequence(MySequence);
@@ -40,8 +42,5 @@ export class OtpGeneratorApplication extends BootMixin(
         nested: true,
       },
     };
-
-    // Load up environment variables
-    dotenv.config();
   }
 }

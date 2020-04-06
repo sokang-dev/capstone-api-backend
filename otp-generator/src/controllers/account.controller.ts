@@ -58,7 +58,7 @@ export class AccountController {
         content: {
           'application/json': {
             schema: {
-              username: 'string',
+              id: 'string',
             },
           },
         },
@@ -74,7 +74,7 @@ export class AccountController {
       },
     })
     account: Account,
-  ): Promise<void> {
+  ): Promise<object> {
     const exists = await this.accountRepository.findOne({
       where: {username: account.username},
     });
@@ -86,6 +86,8 @@ export class AccountController {
     } else {
       throw new HttpErrors.Unauthorized('Incorrect login credentials');
     }
+
+    return {id: exists.id};
   }
 
   // Get all accounts
