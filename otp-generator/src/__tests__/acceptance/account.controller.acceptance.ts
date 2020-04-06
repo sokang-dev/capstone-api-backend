@@ -30,10 +30,14 @@ describe('AccountController', () => {
     const req = {...accountData};
 
     // Act
-    const res = await client.post('/accounts/register').send(req).expect(200);
+    const res = await client
+      .post('/api/accounts/register')
+      .send(req)
+      .expect(200);
 
     // Assert
     expect(res.body.username).to.equal('john217');
+    expect(res.body).to.not.have.property('password');
   });
 
   it('login successfully', async () => {
@@ -44,10 +48,11 @@ describe('AccountController', () => {
     };
 
     // Act
-    const res = await client.post('/accounts/login').send(req).expect(204);
+    const res = await client.post('/api/accounts/login').send(req).expect(200);
 
     // Assert
-    expect(res.body).to.empty();
+    expect(res.body).to.have.property('id');
+    expect(res.body).to.not.have.property('password');
   });
 
   // Private helper functions
