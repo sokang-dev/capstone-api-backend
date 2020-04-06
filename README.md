@@ -5,7 +5,9 @@
 
 #### Setting up local database
 1. Install mariadb (Google on how to do that)
-2. Run the `database.sql` script located at `Infrastructure/template/` directory
+2. Run the `database.sql` script located at `/InfrastructureAWS/template/` directory
+
+
 **Note:** Later on, hopefully we wouldn't need to run `database.sql` script, we would depend on LoopBack migrate feature.
 
 #### Setting up LoopBack
