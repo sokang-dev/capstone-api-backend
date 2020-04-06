@@ -1,6 +1,7 @@
-import {model, property, belongsTo} from '@loopback/repository';
-import {TimestampEntity} from './TimestampEntity.model';
+import {belongsTo, hasMany, model, property} from '@loopback/repository';
 import {Account, AccountWithRelations} from './account.model';
+import {Applicationuser} from './applicationuser.model';
+import {TimestampEntity} from './TimestampEntity.model';
 
 @model({
   settings: {
@@ -82,6 +83,9 @@ export class Application extends TimestampEntity {
     },
   })
   otpLifetime: number;
+
+  @hasMany(() => Applicationuser, {keyTo: 'Application.Id'})
+  applicationusers?: Applicationuser[];
 
   constructor(data?: Partial<Application>) {
     super(data);
