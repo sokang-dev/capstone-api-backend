@@ -1,5 +1,14 @@
 import {Filter, FilterExcludingWhere, repository} from '@loopback/repository';
-import {del, get, getModelSchemaRef, param, patch, post, put, requestBody} from '@loopback/rest';
+import {
+  del,
+  get,
+  getModelSchemaRef,
+  param,
+  patch,
+  post,
+  put,
+  requestBody,
+} from '@loopback/rest';
 import {Application} from '../models';
 import {ApplicationRepository} from '../repositories';
 
@@ -68,7 +77,8 @@ export class ApplicationController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Application, {exclude: 'where'}) filter?: FilterExcludingWhere<Application>
+    @param.filter(Application, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Application>,
   ): Promise<Application> {
     return this.applicationRepository.findById(id, filter);
   }
