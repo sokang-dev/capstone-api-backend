@@ -1,30 +1,12 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getFilterSchemaFor,
-  getModelSchemaRef,
-  getWhereSchemaFor,
-  patch,
-  put,
-  del,
-  requestBody,
-} from '@loopback/rest';
+import {Filter, FilterExcludingWhere, repository} from '@loopback/repository';
+import {del, get, getModelSchemaRef, param, patch, post, put, requestBody} from '@loopback/rest';
 import {Application} from '../models';
 import {ApplicationRepository} from '../repositories';
 
 export class ApplicationController {
   constructor(
     @repository(ApplicationRepository)
-    public applicationRepository : ApplicationRepository,
+    public applicationRepository: ApplicationRepository,
   ) {}
 
   @post('/applications', {
@@ -51,20 +33,6 @@ export class ApplicationController {
     return this.applicationRepository.create(application);
   }
 
-  @get('/applications/count', {
-    responses: {
-      '200': {
-        description: 'Application model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async count(
-    @param.where(Application) where?: Where<Application>,
-  ): Promise<Count> {
-    return this.applicationRepository.count(where);
-  }
-
   @get('/applications', {
     responses: {
       '200': {
@@ -84,28 +52,6 @@ export class ApplicationController {
     @param.filter(Application) filter?: Filter<Application>,
   ): Promise<Application[]> {
     return this.applicationRepository.find(filter);
-  }
-
-  @patch('/applications', {
-    responses: {
-      '200': {
-        description: 'Application PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Application, {partial: true}),
-        },
-      },
-    })
-    application: Application,
-    @param.where(Application) where?: Where<Application>,
-  ): Promise<Count> {
-    return this.applicationRepository.updateAll(application, where);
   }
 
   @get('/applications/{id}', {
