@@ -53,11 +53,11 @@ describe('Account-ApplicationController', () => {
 
     // Act
     const getApplicationByIdRes = await client
-      .get('/accounts/1/applications/')
+      .get('/api/accounts/1/applications/')
       .expect(200);
 
     const getAllApplicationsFilteredRes = await client
-      .get('/applications/?filter[where][accountId]=1')
+      .get('/api/applications/?filter[where][accountId]=1')
       .expect(200);
 
     // Assert

@@ -28,13 +28,10 @@ describe('ApplicationController', () => {
   it('Get an Application', async () => {
     // Arrange
     const req = {...testApplication};
-    const res = await client.post('/applications').send(req).expect(200);
+    const res = await client.post('/api/applications').send(req).expect(200);
 
     // Act
-    await client
-      .get('/applications/' + res.body.id)
-      .send(req)
-      .expect(200);
+    await client.get('/api/applications/' + res.body.id).expect(200);
 
     // Assert
     expect(res.body.applicationName).to.equal('test application');
@@ -45,7 +42,7 @@ describe('ApplicationController', () => {
     const req = {...testApplication};
 
     // Act
-    const res = await client.post('/applications').send(req).expect(200);
+    const res = await client.post('/api/applications').send(req).expect(200);
 
     // Assert
     expect(res.body.applicationName).to.equal('test application');
@@ -59,10 +56,10 @@ describe('ApplicationController', () => {
     };
     await applicationRepo.create(old);
 
-    await client.patch('/applications/1').send(updated).expect(204);
+    await client.patch('/api/applications/1').send(updated).expect(204);
 
     // Assert
-    const get = await client.get('/applications/1').expect(200);
+    const get = await client.get('/api/applications/1').expect(200);
     expect(get.body.applicationName).to.equal('updated application');
   });
 
@@ -72,10 +69,10 @@ describe('ApplicationController', () => {
     await applicationRepo.create(req);
 
     // Act
-    await client.delete('/applications/1').expect(204);
+    await client.delete('/api/applications/1').expect(204);
 
     // Assert
-    await client.get('/applications/1').expect(404);
+    await client.get('/api/applications/1').expect(404);
   });
 
   it('Get all Applications', async () => {
@@ -83,10 +80,10 @@ describe('ApplicationController', () => {
     const req = {...testApplication};
 
     // Act
-    await client.post('/applications').send(req).expect(200);
+    await client.post('/api/applications').send(req).expect(200);
 
     // Assert
-    await client.get('/applications').expect(200);
+    await client.get('/api/applications').expect(200);
   });
 
   // Private helper functions
