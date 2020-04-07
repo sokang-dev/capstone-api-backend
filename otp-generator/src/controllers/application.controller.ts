@@ -6,7 +6,6 @@ import {
   param,
   patch,
   post,
-  put,
   requestBody,
 } from '@loopback/rest';
 import {Application} from '../models';
@@ -102,20 +101,6 @@ export class ApplicationController {
     application: Application,
   ): Promise<void> {
     await this.applicationRepository.updateById(id, application);
-  }
-
-  @put('/applications/{id}', {
-    responses: {
-      '204': {
-        description: 'Application PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() application: Application,
-  ): Promise<void> {
-    await this.applicationRepository.replaceById(id, application);
   }
 
   @del('/applications/{id}', {
