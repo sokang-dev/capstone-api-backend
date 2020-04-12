@@ -113,21 +113,6 @@ export class ApplicationuserController {
     await this.applicationuserRepository.updateById(id, applicationuser);
   }
 
-  //Full update application user by id
-  @put('/applicationusers/{id}', {
-    responses: {
-      '204': {
-        description: 'Applicationuser PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() applicationuser: Applicationuser,
-  ): Promise<void> {
-    await this.applicationuserRepository.replaceById(id, applicationuser);
-  }
-
   //Delete application user by id
   @del('/applicationusers/{id}', {
     responses: {
