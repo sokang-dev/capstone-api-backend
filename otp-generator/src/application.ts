@@ -8,6 +8,7 @@ import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
+import {AuthenticationComponent} from '@loopback/authentication';
 
 import {MySequence} from './sequence';
 
@@ -17,11 +18,11 @@ export class OtpGeneratorApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
-    // Set up API base path
-    this.basePath('/api');
-
     // Set up the custom sequence
     this.sequence(MySequence);
+
+    // Set up API base path
+    this.basePath('/api');
 
     // Set up default home page
     this.static('/', path.join(__dirname, '../public'));
@@ -42,5 +43,8 @@ export class OtpGeneratorApplication extends BootMixin(
         nested: true,
       },
     };
+
+    // Load authentication component
+    this.component(AuthenticationComponent);
   }
 }
