@@ -10,10 +10,10 @@ describe('ApplicationUserController', () => {
   let appUserRepo: ApplicationuserRepository;
 
   const appUserData = {
-    email : 'johnsmith@gmail.com',
-    userSecret : 'rNONHRni6BAk7y2TiKrv',
-    mobileNumber : '04162811',
-    id: 1
+    email: 'johnsmith@gmail.com',
+    userSecret: 'rNONHRni6BAk7y2TiKrv',
+    mobileNumber: '04162811',
+    id: 1,
   };
 
   before('setupApplication', async () => {
@@ -31,12 +31,15 @@ describe('ApplicationUserController', () => {
     const req = appUserData;
 
     // Act
-    const res = await client.post('/api/applicationusers').send(req).expect(200);
+    const res = await client
+      .post('/api/applicationusers')
+      .send(req)
+      .expect(200);
 
     // Assert
     expect(res.body.email).to.equal('johnsmith@gmail.com');
     expect(res.body.userSecret).to.equal('rNONHRni6BAk7y2TiKrv');
-    expect(res.body.mobileNumber).to.equal('04162811'); 
+    expect(res.body.mobileNumber).to.equal('04162811');
   });
 
   it('Get app user by id', async () => {
@@ -44,29 +47,37 @@ describe('ApplicationUserController', () => {
     const req = {...appUserData};
 
     // Act
-    const res = await client.get('/api/applicationusers/' + req.id).send(req).expect(200);
+    const res = await client
+      .get('/api/applicationusers/' + req.id)
+      .send(req)
+      .expect(200);
 
     // Assert
     expect(res.body.email).to.equal('johnsmith@gmail.com');
     expect(res.body.userSecret).to.equal('rNONHRni6BAk7y2TiKrv');
-    expect(res.body.mobileNumber).to.equal('04162811'); 
+    expect(res.body.mobileNumber).to.equal('04162811');
   });
- 
+
   it('Partial update app user by id', async () => {
     // Arrange
     const req = {...appUserData};
 
     // Act /Assert
-    const res = await client.patch('/api/applicationusers/' + req.id).send(req).expect(204);
+    await client
+      .patch('/api/applicationusers/' + req.id)
+      .send(req)
+      .expect(204);
+  });
 
-   });
-
-   it('Delete app user by id', async () => {
+  it('Delete app user by id', async () => {
     // Arrange
     const req = {...appUserData};
 
     // Act
-    const res = await client.delete('/api/applicationusers/' + req.id).send(req).expect(204);
+    const res = await client
+      .delete('/api/applicationusers/' + req.id)
+      .send(req)
+      .expect(204);
 
     // Assert
     expect(res.body).to.not.have.property('id');
