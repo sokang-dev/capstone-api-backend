@@ -4,7 +4,7 @@ import {UserProfile, securityId} from '@loopback/security';
 import {HttpErrors} from '@loopback/rest';
 import {promisify} from 'util';
 
-import {TokenServiceBindings} from '../keys';
+import {JWTServiceBindings} from '../keys';
 
 const jwt = require('jsonwebtoken');
 const signAsync = promisify(jwt.sign);
@@ -12,8 +12,8 @@ const verifyAsync = promisify(jwt.verify);
 
 export class JwtService implements TokenService {
   constructor(
-    @inject(TokenServiceBindings.JWT_SECRET) private jwtSecret: string,
-    @inject(TokenServiceBindings.JWT_LIFESPAN) private jwtLifespan: string,
+    @inject(JWTServiceBindings.JWT_SECRET) private jwtSecret: string,
+    @inject(JWTServiceBindings.JWT_LIFESPAN) private jwtLifespan: string,
   ) {}
 
   async generateToken(userProfile: UserProfile): Promise<string> {
