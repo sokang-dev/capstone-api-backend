@@ -58,6 +58,7 @@
     "@types/bcrypt": "3.0.0",
     "bcrypt": "4.0.1",
     "dotenv": "8.2.0",
+    "jsonwebtoken": "8.5.1",
     "loopback-connector-mysql": "5.4.3",
     "tslib": "^1.10.0"
   },

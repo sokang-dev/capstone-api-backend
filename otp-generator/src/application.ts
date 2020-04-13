@@ -50,12 +50,12 @@ export class OtpGeneratorApplication extends BootMixin(
   }
 
   setupBindings(): void {
-    this.bind(TokenServiceBindings.JWT_TOKEN_SECRET).to(
-      TokenServiceConstants.JWT_TOKEN_SECRET_VALUE,
+    this.bind(TokenServiceBindings.JWT_SECRET).to(
+      TokenServiceConstants.JWT_SECRET_VALUE,
     );
 
-    this.bind(TokenServiceBindings.JWT_TOKEN_LIFESPAN).to(
-      TokenServiceConstants.JWT_TOKEN_LIFESPAN_VALUE,
+    this.bind(TokenServiceBindings.JWT_LIFESPAN).to(
+      TokenServiceConstants.JWT_LIFESPAN_VALUE,
     );
   }
 }
