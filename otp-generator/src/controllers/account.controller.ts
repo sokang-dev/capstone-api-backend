@@ -15,9 +15,10 @@ import {Account, Credentials} from '../models';
 import {AccountRepository} from '../repositories';
 import {inject} from '@loopback/core';
 import {AccountServiceBindings, JWTServiceBindings} from '../keys';
-import {UserService} from '@loopback/authentication';
+import {UserService, authenticate} from '@loopback/authentication';
 import {JwtService} from '../services';
 
+@authenticate('jwt')
 export class AccountController {
   constructor(
     @repository(AccountRepository)
@@ -40,6 +41,7 @@ export class AccountController {
       },
     },
   })
+  @authenticate.skip()
   async register(
     @requestBody({
       content: {
@@ -77,6 +79,7 @@ export class AccountController {
       },
     },
   })
+  @authenticate.skip()
   async login(
     @requestBody({
       content: {

@@ -8,7 +8,10 @@ import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
-import {AuthenticationComponent} from '@loopback/authentication';
+import {
+  AuthenticationComponent,
+  registerAuthenticationStrategy,
+} from '@loopback/authentication';
 
 import {MySequence} from './sequence';
 import {
@@ -18,6 +21,7 @@ import {
 } from './keys';
 import {JwtService, AccountService} from './services';
 import {JWTAuthenticationStrategy} from './jwt-strategy';
+import {SECURITY_SPEC} from './utils/security-spec';
 
 export class OtpGeneratorApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -25,11 +29,21 @@ export class OtpGeneratorApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
+    this.api({
+      openapi: '3.0.0',
+      info: {title: 'asd', version: '1.0.0'},
+      paths: {},
+      components: {},
+      servers: [],
+      security: SECURITY_SPEC,
+    });
+
     this.setupBindings();
 
     // Load authentication component
     this.component(AuthenticationComponent);
-    this.add(createBindingFromClass(JWTAuthenticationStrategy));
+    // this.add(createBindingFromClass(JWTAuthenticationStrategy));
+    registerAuthenticationStrategy(this, JWTAuthenticationStrategy);
 
     // Set up the custom sequence
     this.sequence(MySequence);

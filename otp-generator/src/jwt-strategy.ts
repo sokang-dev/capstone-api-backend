@@ -1,10 +1,22 @@
-import {AuthenticationStrategy, TokenService} from '@loopback/authentication';
-import {inject} from '@loopback/core';
+import {
+  AuthenticationStrategy,
+  TokenService,
+  asAuthStrategy,
+} from '@loopback/authentication';
+import {inject, bind} from '@loopback/context';
 import {UserProfile} from '@loopback/security';
-import {HttpErrors, Request} from '@loopback/rest';
+import {
+  HttpErrors,
+  Request,
+  asSpecEnhancer,
+  OpenApiSpec,
+  mergeSecuritySchemeToSpec,
+} from '@loopback/rest';
 
 import {JWTServiceBindings} from './keys';
 
+// @bind(asAuthStrategy, asSpecEnhancer)
+@bind(asSpecEnhancer)
 export class JWTAuthenticationStrategy implements AuthenticationStrategy {
   name = 'jwt';
 
@@ -45,5 +57,13 @@ export class JWTAuthenticationStrategy implements AuthenticationStrategy {
     const token = parts[1];
 
     return token;
+  }
+
+  modifySpec(spec: OpenApiSpec): OpenApiSpec {
+    return mergeSecuritySchemeToSpec(spec, this.name, {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    });
   }
 }
