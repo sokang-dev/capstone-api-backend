@@ -8,7 +8,6 @@ import {
   put,
   del,
   requestBody,
-  HttpErrors,
 } from '@loopback/rest';
 import * as bcrypt from 'bcrypt';
 

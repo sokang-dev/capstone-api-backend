@@ -3,6 +3,7 @@ import {Client, expect} from '@loopback/testlab';
 import {OtpGeneratorApplication} from '../..';
 import {setupApplication} from './test-helper';
 import {AccountRepository} from '../../repositories';
+import {Credentials} from '../../models';
 
 describe('AccountController', () => {
   let app: OtpGeneratorApplication;
@@ -40,19 +41,20 @@ describe('AccountController', () => {
     expect(res.body).to.not.have.property('password');
   });
 
-  it('login successfully', async () => {
+  it('login returns a JWT token', async () => {
     // Arrange
-    const req = {
+    const req: Credentials = {
       username: accountData.username,
       password: accountData.password,
     };
 
     // Act
-    const res = await client.post('/api/accounts/login').send(req).expect(200);
+    const res = await client.post('/api/accounts/login').send(req);
 
     // Assert
-    expect(res.body).to.have.property('id');
-    expect(res.body).to.not.have.property('password');
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('token');
+    expect(res.body.token).to.not.be.empty();
   });
 
   // Private helper functions
