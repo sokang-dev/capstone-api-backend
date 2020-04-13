@@ -11,12 +11,14 @@ import {
   asSpecEnhancer,
   OpenApiSpec,
   mergeSecuritySchemeToSpec,
+  mergeOpenAPISpec,
 } from '@loopback/rest';
 
 import {JWTServiceBindings} from './keys';
 
-// @bind(asAuthStrategy, asSpecEnhancer)
-@bind(asSpecEnhancer)
+export const SECURITY_SPEC = [{jwt: []}];
+
+@bind(asAuthStrategy, asSpecEnhancer)
 export class JWTAuthenticationStrategy implements AuthenticationStrategy {
   name = 'jwt';
 
@@ -60,7 +62,12 @@ export class JWTAuthenticationStrategy implements AuthenticationStrategy {
   }
 
   modifySpec(spec: OpenApiSpec): OpenApiSpec {
-    return mergeSecuritySchemeToSpec(spec, this.name, {
+    const securitySpec = {
+      security: SECURITY_SPEC,
+    };
+    const mergedSpec = mergeOpenAPISpec(spec, securitySpec);
+
+    return mergeSecuritySchemeToSpec(mergedSpec, this.name, {
       type: 'http',
       scheme: 'bearer',
       bearerFormat: 'JWT',
