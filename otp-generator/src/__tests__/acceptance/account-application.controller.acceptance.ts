@@ -14,7 +14,7 @@ describe('Account-ApplicationController', () => {
     accountRepo = await app.getRepository(AccountRepository);
     applicationRepo = await app.getRepository(ApplicationRepository);
   });
-  before(clearDatabase);
+  beforeEach(clearDatabase);
 
   after(async () => {
     await app.stop();
@@ -28,9 +28,14 @@ describe('Account-ApplicationController', () => {
       password: 'password',
       apikey: 'secretkey',
     };
+    const accountData2 = {
+      username: 'john219',
+      password: 'password',
+      apikey: 'secretkey',
+    };
     await accountRepo.create(accountData);
     //Create a second account
-    await accountRepo.create(accountData);
+    await accountRepo.create(accountData2);
 
     //Create Applications
     const testApplication = {

@@ -19,7 +19,7 @@ describe('ApplicationController', () => {
     ({app, client} = await setupApplication());
     applicationRepo = await app.getRepository(ApplicationRepository);
   });
-  before(clearDatabase);
+  beforeEach(clearDatabase);
 
   after(async () => {
     await app.stop();
@@ -54,25 +54,30 @@ describe('ApplicationController', () => {
     const updated = {
       applicationName: 'updated application',
     };
-    await applicationRepo.create(old);
+    const res = await client.post('/api/applications').send(old).expect(200);
 
-    await client.patch('/api/applications/1').send(updated).expect(204);
+    await client
+      .patch('/api/applications/' + res.body.id)
+      .send(updated)
+      .expect(204);
 
     // Assert
-    const get = await client.get('/api/applications/1').expect(200);
+    const get = await client
+      .get('/api/applications/' + res.body.id)
+      .expect(200);
     expect(get.body.applicationName).to.equal('updated application');
   });
 
   it('Delete an Application', async () => {
     // Arrange
     const req = {...testApplication};
-    await applicationRepo.create(req);
+    const res = await client.post('/api/applications').send(req).expect(200);
 
     // Act
-    await client.delete('/api/applications/1').expect(204);
+    await client.delete('/api/applications/' + res.body.id).expect(204);
 
     // Assert
-    await client.get('/api/applications/1').expect(404);
+    await client.get('/api/applications/' + res.body.id).expect(404);
   });
 
   it('Get all Applications', async () => {
