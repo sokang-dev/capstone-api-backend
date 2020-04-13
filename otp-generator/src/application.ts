@@ -1,5 +1,5 @@
 import {BootMixin} from '@loopback/boot';
-import {ApplicationConfig} from '@loopback/core';
+import {ApplicationConfig, createBindingFromClass} from '@loopback/core';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
@@ -16,14 +16,23 @@ import {
   JWTServiceBindings,
   AccountServiceBindings,
 } from './keys';
-import {JwtService} from './services';
-import {AccountService} from './services/account.service';
+import {JwtService, AccountService} from './services';
+import {JWTAuthenticationStrategy} from './jwt-strategy';
 
 export class OtpGeneratorApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
   constructor(options: ApplicationConfig = {}) {
     super(options);
+
+    this.setupBindings();
+
+    // Load authentication component
+    this.component(AuthenticationComponent);
+    this.add(createBindingFromClass(JWTAuthenticationStrategy));
+
+    // Set up the custom sequence
+    this.sequence(MySequence);
 
     // Set up API base path
     this.basePath('/api');
@@ -47,12 +56,6 @@ export class OtpGeneratorApplication extends BootMixin(
         nested: true,
       },
     };
-
-    // Load authentication component
-    this.component(AuthenticationComponent);
-
-    // Set up the custom sequence
-    this.sequence(MySequence);
   }
 
   setupBindings(): void {

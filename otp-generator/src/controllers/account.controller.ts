@@ -12,13 +12,21 @@ import {
 } from '@loopback/rest';
 import * as bcrypt from 'bcrypt';
 
-import {Account} from '../models';
+import {Account, Credentials} from '../models';
 import {AccountRepository} from '../repositories';
+import {inject} from '@loopback/core';
+import {AccountServiceBindings, JWTServiceBindings} from '../keys';
+import {UserService} from '@loopback/authentication';
+import {JwtService} from '../services';
 
 export class AccountController {
   constructor(
     @repository(AccountRepository)
     public accountRepository: AccountRepository,
+    @inject(AccountServiceBindings.ACCOUNT_SERVICE)
+    public accountService: UserService<Account, Credentials>,
+    @inject(JWTServiceBindings.JWT_SERVICE)
+    public jwtService: JwtService,
   ) {}
 
   // Use for hashing password
@@ -54,11 +62,16 @@ export class AccountController {
   @post('/accounts/login', {
     responses: {
       '200': {
-        description: 'Login successful',
+        description: 'Token',
         content: {
           'application/json': {
             schema: {
-              id: 'string',
+              type: 'object',
+              properties: {
+                token: {
+                  type: 'string',
+                },
+              },
             },
           },
         },
@@ -69,25 +82,32 @@ export class AccountController {
     @requestBody({
       content: {
         'application/json': {
-          schema: {username: 'string', password: 'string'},
+          schema: {
+            type: 'object',
+            properties: {
+              username: {
+                type: 'string',
+              },
+              password: {
+                type: 'string',
+              },
+            },
+          },
         },
       },
     })
-    account: Account,
-  ): Promise<object> {
-    const exists = await this.accountRepository.findOne({
-      where: {username: account.username},
-    });
+    credentials: Credentials,
+  ): Promise<{token: string}> {
+    // Verify account exists and password is correct
+    const account = await this.accountService.verifyCredentials(credentials);
 
-    if (exists) {
-      if (!bcrypt.compareSync(account.password, exists.password)) {
-        throw new HttpErrors.Unauthorized('Incorrect login credentials');
-      }
-    } else {
-      throw new HttpErrors.Unauthorized('Incorrect login credentials');
-    }
+    // Convert to UserProfile object (contains only id and username properties)
+    const userProfile = this.accountService.convertToUserProfile(account);
 
-    return {id: exists.id};
+    // Create a JWT
+    const token = await this.jwtService.generateToken(userProfile);
+
+    return {token};
   }
 
   // Get all accounts
