@@ -11,6 +11,7 @@ import path from 'path';
 import {AuthenticationComponent} from '@loopback/authentication';
 
 import {MySequence} from './sequence';
+import {TokenServiceConstants, TokenServiceBindings} from './keys';
 
 export class OtpGeneratorApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -46,5 +47,15 @@ export class OtpGeneratorApplication extends BootMixin(
 
     // Set up the custom sequence
     this.sequence(MySequence);
+  }
+
+  setupBindings(): void {
+    this.bind(TokenServiceBindings.JWT_TOKEN_SECRET).to(
+      TokenServiceConstants.JWT_TOKEN_SECRET_VALUE,
+    );
+
+    this.bind(TokenServiceBindings.JWT_TOKEN_LIFESPAN).to(
+      TokenServiceConstants.JWT_TOKEN_LIFESPAN_VALUE,
+    );
   }
 }
