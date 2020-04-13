@@ -13,18 +13,18 @@ export class AccountService implements UserService<Account, Credentials> {
   ) {}
 
   async verifyCredentials(credentials: Credentials): Promise<Account> {
+    const credentialsError = 'Incorrect login credentials';
+
     const account = await this.accountRepo.findOne({
       where: {username: credentials.username},
     });
 
     if (!account) {
-      throw new HttpErrors.NotFound(
-        `Account ${'credentials.username'} does not exist`,
-      );
+      throw new HttpErrors.Unauthorized(credentialsError);
     }
 
     if (!(await bcrypt.compare(credentials.password, account.password))) {
-      throw new HttpErrors.Unauthorized('Incorrect login credentials');
+      throw new HttpErrors.Unauthorized(credentialsError);
     }
 
     return account;

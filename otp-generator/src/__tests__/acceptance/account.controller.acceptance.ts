@@ -41,20 +41,54 @@ describe('AccountController', () => {
     expect(res.body).to.not.have.property('password');
   });
 
-  it('login returns a JWT token', async () => {
-    // Arrange
-    const req: Credentials = {
-      username: accountData.username,
-      password: accountData.password,
-    };
+  describe('Login', () => {
+    const credentialsError = 'Incorrect login credentials';
 
-    // Act
-    const res = await client.post('/api/accounts/login').send(req);
+    it('login returns a JWT token when successful', async () => {
+      // Arrange
+      const req: Credentials = {
+        username: accountData.username,
+        password: accountData.password,
+      };
 
-    // Assert
-    expect(res.status).to.equal(200);
-    expect(res.body).to.have.property('token');
-    expect(res.body.token).to.not.be.empty();
+      // Act
+      const res = await client.post('/api/accounts/login').send(req);
+
+      // Assert
+      expect(res.status).to.equal(200);
+      expect(res.body).to.have.property('token');
+      expect(res.body.token).to.not.be.empty();
+    });
+
+    it('login returns an error with non-existent username', async () => {
+      // Arrange
+      const req: Credentials = {
+        username: 'wronggg!!',
+        password: accountData.password,
+      };
+
+      // Act
+      const res = await client.post('/api/accounts/login').send(req);
+
+      // Assert
+      expect(res.status).to.equal(401); // Unauthorized
+      expect(res.body.error.message).to.equal(credentialsError);
+    });
+
+    it('login returns an error with incorrect password', async () => {
+      // Arrange
+      const req: Credentials = {
+        username: accountData.username,
+        password: 'wronggg!!',
+      };
+
+      // Act
+      const res = await client.post('/api/accounts/login').send(req);
+
+      // Assert
+      expect(res.status).to.equal(401); // Unauthorized
+      expect(res.body.error.message).to.equal(credentialsError);
+    });
   });
 
   // Private helper functions
