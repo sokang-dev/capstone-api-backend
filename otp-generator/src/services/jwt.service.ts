@@ -5,7 +5,6 @@ import {HttpErrors} from '@loopback/rest';
 import {promisify} from 'util';
 
 import {TokenServiceBindings} from '../keys';
-import {decode} from 'punycode';
 
 const jwt = require('jsonwebtoken');
 const signAsync = promisify(jwt.sign);
@@ -17,8 +16,8 @@ export class JwtService implements TokenService {
     @inject(TokenServiceBindings.JWT_LIFESPAN) private jwtLifespan: string,
   ) {}
 
-  async generateToken(UserProfile: UserProfile): Promise<string> {
-    if (!UserProfile) {
+  async generateToken(userProfile: UserProfile): Promise<string> {
+    if (!userProfile) {
       throw new HttpErrors.Unauthorized(
         'Error generating token: userProfile is null',
       );
@@ -26,7 +25,7 @@ export class JwtService implements TokenService {
 
     let token: string;
     try {
-      token = await signAsync(UserProfile, this.jwtSecret, {
+      token = await signAsync(userProfile, this.jwtSecret, {
         expiresIn: Number(this.jwtLifespan),
       });
     } catch (err) {
