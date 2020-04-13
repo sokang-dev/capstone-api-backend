@@ -12,6 +12,7 @@ import {AuthenticationComponent} from '@loopback/authentication';
 
 import {MySequence} from './sequence';
 import {TokenServiceConstants, TokenServiceBindings} from './keys';
+import {JwtService} from './services';
 
 export class OtpGeneratorApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -50,12 +51,15 @@ export class OtpGeneratorApplication extends BootMixin(
   }
 
   setupBindings(): void {
+    // Bind JWT secret and lifespan
     this.bind(TokenServiceBindings.JWT_SECRET).to(
       TokenServiceConstants.JWT_SECRET_VALUE,
     );
-
     this.bind(TokenServiceBindings.JWT_LIFESPAN).to(
       TokenServiceConstants.JWT_LIFESPAN_VALUE,
     );
+
+    // Bind JWT service
+    this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JwtService);
   }
 }
