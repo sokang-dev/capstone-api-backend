@@ -4,7 +4,7 @@ import {OtpGeneratorApplication} from '../..';
 import {setupApplication} from './test-helper';
 import {ApplicationuserRepository} from '../../repositories';
 
-describe('ApplicationUserController', () => {
+describe('ApplicationUserController tests', () => {
   let app: OtpGeneratorApplication;
   let client: Client;
   let appUserRepo: ApplicationuserRepository;
@@ -80,7 +80,7 @@ describe('ApplicationUserController', () => {
       .expect(204);
 
     // Assert
-    expect(res.body).to.not.have.property('id');
+    expect(res.body).empty();
   });
 
   // Private helper functions
