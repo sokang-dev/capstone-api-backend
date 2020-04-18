@@ -1,18 +1,12 @@
 import {Client, expect} from '@loopback/testlab';
 
 import {OtpGeneratorApplication} from '../..';
-import {
-  setupApplication,
-  setupAccountRepositories,
-  clearDatabase,
-} from './test-helper';
-import {AccountRepository} from '../../repositories';
+import {setupApplication, clearDatabase} from './test-helper';
 import {Credentials} from '../../models';
 
 describe('AccountController', () => {
   let app: OtpGeneratorApplication;
   let client: Client;
-  let accountRepo: AccountRepository;
 
   const accountData = {
     username: 'john217',
@@ -22,10 +16,6 @@ describe('AccountController', () => {
 
   before('Setup Application', async () => {
     ({app, client} = await setupApplication());
-  });
-
-  before('Setup Repositories', async () => {
-    ({accountRepo} = await setupAccountRepositories(app));
   });
 
   before('Clear Database', async () => {

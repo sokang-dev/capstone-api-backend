@@ -3,15 +3,14 @@ import {
   givenHttpServerConfig,
   Client,
 } from '@loopback/testlab';
-import {RestApplication} from '@loopback/rest';
 
 import {OtpGeneratorApplication} from '../..';
-import {juggler, DefaultCrudRepository} from '@loopback/repository';
 import {
   AccountRepository,
   ApplicationRepository,
   ApplicationuserRepository,
 } from '../../repositories';
+import {Account, Credentials} from '../../models';
 
 export interface AppWithClient {
   app: OtpGeneratorApplication;
@@ -87,7 +86,30 @@ export async function clearDatabase(app: OtpGeneratorApplication) {
   applicationuserRepo.deleteAll();
 }
 
-const testdb: juggler.DataSource = new juggler.DataSource({
-  name: 'db',
-  connector: 'memory',
-});
+export async function registerAnAccount(
+  client: Client,
+  account: Partial<Account>,
+) {
+  const req = {
+    username: account.username,
+    password: account.password,
+    apikey: account.apikey,
+  };
+
+  const res = await client.post('/api/accounts/register').send(req);
+  return res;
+}
+
+export async function authenticateAnAccount(
+  client: Client,
+  account: Partial<Account>,
+) {
+  const req = {
+    username: account.username,
+    password: account.password,
+  };
+
+  const res = await client.post('/api/accounts/login').send(req);
+
+  return res.body.token;
+}

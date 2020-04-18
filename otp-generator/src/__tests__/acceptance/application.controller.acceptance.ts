@@ -1,16 +1,24 @@
 import {Client, expect} from '@loopback/testlab';
+
 import {OtpGeneratorApplication} from '../..';
-import {ApplicationRepository} from '../../repositories';
 import {
   setupApplication,
-  setupApplicatioRepositories,
   clearDatabase,
+  registerAnAccount,
+  authenticateAnAccount,
 } from './test-helper';
+import {Account} from '../../models';
 
 describe('ApplicationController', () => {
   let app: OtpGeneratorApplication;
   let client: Client;
-  let applicationRepo: ApplicationRepository;
+  let token: string;
+
+  const accountData: Partial<Account> = {
+    username: 'john217',
+    password: 'password',
+    apikey: 'secretkey',
+  };
 
   const testApplication = {
     applicationName: 'test application',
@@ -23,12 +31,13 @@ describe('ApplicationController', () => {
     ({app, client} = await setupApplication());
   });
 
-  before('Setup Repositories', async () => {
-    ({applicationRepo} = await setupApplicatioRepositories(app));
-  });
-
   beforeEach('Clear Database', async () => {
     await clearDatabase(app);
+  });
+
+  beforeEach('Get a valid JWT token', async () => {
+    await registerAnAccount(client, accountData);
+    token = await authenticateAnAccount(client, accountData);
   });
 
   after(async () => {
@@ -38,10 +47,17 @@ describe('ApplicationController', () => {
   it('Get an Application', async () => {
     // Arrange
     const req = {...testApplication};
-    const res = await client.post('/api/applications').send(req).expect(200);
+    const res = await client
+      .post('/api/applications')
+      .set('Authorization', 'Bearer ' + token)
+      .send(req)
+      .expect(200);
 
     // Act
-    await client.get('/api/applications/' + res.body.id).expect(200);
+    await client
+      .get('/api/applications/' + res.body.id)
+      .set('Authorization', 'Bearer ' + token)
+      .expect(200);
 
     // Assert
     expect(res.body.applicationName).to.equal('test application');
@@ -52,7 +68,11 @@ describe('ApplicationController', () => {
     const req = {...testApplication};
 
     // Act
-    const res = await client.post('/api/applications').send(req).expect(200);
+    const res = await client
+      .post('/api/applications')
+      .set('Authorization', 'Bearer ' + token)
+      .send(req)
+      .expect(200);
 
     // Assert
     expect(res.body.applicationName).to.equal('test application');
@@ -64,16 +84,22 @@ describe('ApplicationController', () => {
     const updated = {
       applicationName: 'updated application',
     };
-    const res = await client.post('/api/applications').send(old).expect(200);
+    const res = await client
+      .post('/api/applications')
+      .set('Authorization', 'Bearer ' + token)
+      .send(old)
+      .expect(200);
 
     await client
       .patch('/api/applications/' + res.body.id)
+      .set('Authorization', 'Bearer ' + token)
       .send(updated)
       .expect(204);
 
     // Assert
     const get = await client
       .get('/api/applications/' + res.body.id)
+      .set('Authorization', 'Bearer ' + token)
       .expect(200);
     expect(get.body.applicationName).to.equal('updated application');
   });
@@ -81,13 +107,23 @@ describe('ApplicationController', () => {
   it('Delete an Application', async () => {
     // Arrange
     const req = {...testApplication};
-    const res = await client.post('/api/applications').send(req).expect(200);
+    const res = await client
+      .post('/api/applications')
+      .set('Authorization', 'Bearer ' + token)
+      .send(req)
+      .expect(200);
 
     // Act
-    await client.delete('/api/applications/' + res.body.id).expect(204);
+    await client
+      .delete('/api/applications/' + res.body.id)
+      .set('Authorization', 'Bearer ' + token)
+      .expect(204);
 
     // Assert
-    await client.get('/api/applications/' + res.body.id).expect(404);
+    await client
+      .get('/api/applications/' + res.body.id)
+      .set('Authorization', 'Bearer ' + token)
+      .expect(404);
   });
 
   it('Get all Applications', async () => {
@@ -95,9 +131,16 @@ describe('ApplicationController', () => {
     const req = {...testApplication};
 
     // Act
-    await client.post('/api/applications').send(req).expect(200);
+    await client
+      .post('/api/applications')
+      .send(req)
+      .set('Authorization', 'Bearer ' + token)
+      .expect(200);
 
     // Assert
-    await client.get('/api/applications').expect(200);
+    await client
+      .get('/api/applications')
+      .set('Authorization', 'Bearer ' + token)
+      .expect(200);
   });
 });
