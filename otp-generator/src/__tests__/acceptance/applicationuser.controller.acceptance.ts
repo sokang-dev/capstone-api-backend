@@ -58,7 +58,7 @@ describe('ApplicationUserController tests', () => {
     expect(res.body.mobileNumber).to.equal('04162811');
   });
 
-  it('Get app user by id returns an error when a JWT token is not provided', async () => {
+  it('Get app user by id returns an error when JWT token is not provided', async () => {
     // Arrange
     const req = {...appUserData};
 

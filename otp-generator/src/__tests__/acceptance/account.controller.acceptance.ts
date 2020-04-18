@@ -109,7 +109,7 @@ describe('AccountController', () => {
       expect(res.status).to.equal(200);
     });
 
-    it(`GET '/accounts' returns an error when a JWT token is not provided`, async () => {
+    it(`GET '/accounts' returns an error when JWT token is not provided`, async () => {
       // Act
       const res = await client.get('/api/accounts');
 

@@ -44,23 +44,35 @@ describe('ApplicationController', () => {
     await app.stop();
   });
 
+  it('Create an Application returns an error when JWT token is not provided', async () => {
+    // Arrange
+    const req = {...testApplication};
+
+    // Act
+    const res = await client.post('/api/applications').send(req);
+
+    // Assert
+    expect(res.status).to.equal(401);
+    expect(res.body.error.message).to.equal('Authorization header not found');
+  });
+
   it('Get an Application', async () => {
     // Arrange
     const req = {...testApplication};
-    const res = await client
+    const createRes = await client
       .post('/api/applications')
       .set('Authorization', 'Bearer ' + token)
       .send(req)
       .expect(200);
 
     // Act
-    await client
-      .get('/api/applications/' + res.body.id)
+    const getRes = await client
+      .get('/api/applications/' + createRes.body.id)
       .set('Authorization', 'Bearer ' + token)
       .expect(200);
 
     // Assert
-    expect(res.body.applicationName).to.equal('test application');
+    expect(getRes.body.applicationName).to.equal('test application');
   });
 
   it('Create an Application', async () => {
