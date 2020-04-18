@@ -45,7 +45,7 @@ export class JWTAuthenticationStrategy implements AuthenticationStrategy {
     // Auth header must start with 'Bearer' as part of Bearer Authentication scheme
     if (!authHeaderValue.startsWith('Bearer')) {
       throw new HttpErrors.Unauthorized(
-        `'Authorization header is not of type 'Bearer'`,
+        `Authorization header does not have the pattern: 'Bearer xx.yy.zz'`,
       );
     }
 

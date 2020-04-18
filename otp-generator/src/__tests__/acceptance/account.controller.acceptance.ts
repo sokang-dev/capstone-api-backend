@@ -41,7 +41,7 @@ describe('AccountController', () => {
     expect(res.body).to.not.have.property('password');
   });
 
-  describe('Login', () => {
+  describe(`POST '/accounts/login'`, () => {
     const credentialsError = 'Incorrect login credentials';
 
     it(`POST '/accounts/login' returns a JWT token when successful`, async () => {
@@ -89,7 +89,9 @@ describe('AccountController', () => {
       expect(res.status).to.equal(401); // Unauthorized
       expect(res.body.error.message).to.equal(credentialsError);
     });
+  });
 
+  describe(`GET '/accounts'`, () => {
     it(`GET '/accounts' returns all accounts when a valid JWT token is provided`, async () => {
       // Arrange
       let res = await client.post('/api/accounts/login').send({
@@ -114,6 +116,19 @@ describe('AccountController', () => {
       // Assert
       expect(res.status).to.equal(401);
       expect(res.body.error.message).to.equal('Authorization header not found');
+    });
+
+    it(`GET '/accounts' returns an error when an invalid JWT token is not provided`, async () => {
+      // Act
+      const res = await client
+        .get('/api/accounts')
+        .set('Authorization', 'Wronggg ' + 'xx.yy.zz');
+
+      // Assert
+      expect(res.status).to.equal(401);
+      expect(res.body.error.message).to.equal(
+        `Authorization header does not have the pattern: 'Bearer xx.yy.zz'`,
+      );
     });
   });
 
