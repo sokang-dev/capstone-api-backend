@@ -10,7 +10,9 @@ import {
 } from '@loopback/rest';
 import {Application} from '../models';
 import {ApplicationRepository} from '../repositories';
+import {authenticate} from '@loopback/authentication';
 
+@authenticate('jwt')
 export class ApplicationController {
   constructor(
     @repository(ApplicationRepository)

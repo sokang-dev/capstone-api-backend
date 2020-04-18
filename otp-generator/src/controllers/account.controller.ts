@@ -10,12 +10,12 @@ import {
   requestBody,
 } from '@loopback/rest';
 import * as bcrypt from 'bcrypt';
+import {UserService, authenticate} from '@loopback/authentication';
+import {inject} from '@loopback/core';
 
 import {Account, Credentials} from '../models';
 import {AccountRepository} from '../repositories';
-import {inject} from '@loopback/core';
 import {AccountServiceBindings, JWTServiceBindings} from '../keys';
-import {UserService, authenticate} from '@loopback/authentication';
 import {JwtService} from '../services';
 
 @authenticate('jwt')
