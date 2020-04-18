@@ -10,7 +10,7 @@ import {
   ApplicationRepository,
   ApplicationuserRepository,
 } from '../../repositories';
-import {Account, Credentials} from '../../models';
+import {Account} from '../../models';
 
 export interface AppWithClient {
   app: OtpGeneratorApplication;
@@ -44,21 +44,19 @@ export async function setupApplication(): Promise<AppWithClient> {
   return {app, client};
 }
 
-export async function setupAccountRepositories(app: OtpGeneratorApplication) {
+export async function setupAccountRepository(app: OtpGeneratorApplication) {
   const accountRepo = await app.getRepository(AccountRepository);
 
   return {accountRepo};
 }
 
-export async function setupApplicatioRepositories(
-  app: OtpGeneratorApplication,
-) {
+export async function setupApplicationRepository(app: OtpGeneratorApplication) {
   const applicationRepo = await app.getRepository(ApplicationRepository);
 
   return {applicationRepo};
 }
 
-export async function setupApplicationuserRepositories(
+export async function setupApplicationuserRepository(
   app: OtpGeneratorApplication,
 ) {
   const applicationuserRepo = await app.getRepository(
@@ -81,9 +79,9 @@ export async function clearDatabase(app: OtpGeneratorApplication) {
     ApplicationuserRepository,
   );
 
-  accountRepo.deleteAll();
-  applicationRepo.deleteAll();
-  applicationuserRepo.deleteAll();
+  await accountRepo.deleteAll();
+  await applicationRepo.deleteAll();
+  await applicationuserRepo.deleteAll();
 }
 
 export async function registerAnAccount(
