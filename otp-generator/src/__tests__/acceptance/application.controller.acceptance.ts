@@ -27,11 +27,11 @@ describe('ApplicationController', () => {
     otpLifetime: 60,
   };
 
-  before('Setup Application', async () => {
+  before('Setup application', async () => {
     ({app, client} = await setupApplication());
   });
 
-  beforeEach('Clear Database', async () => {
+  beforeEach('Clear database', async () => {
     await clearDatabase(app);
   });
 

@@ -1,13 +1,24 @@
 import {Client, expect} from '@loopback/testlab';
 
 import {OtpGeneratorApplication} from '../..';
-import {setupApplication} from './test-helper';
-import {ApplicationuserRepository} from '../../repositories';
+import {
+  setupApplication,
+  clearDatabase,
+  registerAnAccount,
+  authenticateAnAccount,
+} from './test-helper';
+import {Account} from '../../models';
 
 describe('ApplicationUserController tests', () => {
   let app: OtpGeneratorApplication;
   let client: Client;
-  let appUserRepo: ApplicationuserRepository;
+  let token: string;
+
+  const accountData: Partial<Account> = {
+    username: 'john217',
+    password: 'password',
+    apikey: 'secretkey',
+  };
 
   const appUserData = {
     email: 'johnsmith@gmail.com',
@@ -16,11 +27,15 @@ describe('ApplicationUserController tests', () => {
     id: 1,
   };
 
-  before('setupApplication', async () => {
+  before('Setup application', async () => {
     ({app, client} = await setupApplication());
-    appUserRepo = await app.getRepository(ApplicationuserRepository);
+    await clearDatabase(app);
   });
-  before(clearDatabase);
+
+  beforeEach('Get a valid JWT token', async () => {
+    await registerAnAccount(client, accountData);
+    token = await authenticateAnAccount(client, accountData);
+  });
 
   after(async () => {
     await app.stop();
@@ -33,6 +48,7 @@ describe('ApplicationUserController tests', () => {
     // Act
     const res = await client
       .post('/api/applicationusers')
+      .set('Authorization', 'Bearer ' + token)
       .send(req)
       .expect(200);
 
@@ -49,6 +65,7 @@ describe('ApplicationUserController tests', () => {
     // Act
     const res = await client
       .get('/api/applicationusers/' + req.id)
+      .set('Authorization', 'Bearer ' + token)
       .send(req)
       .expect(200);
 
@@ -65,6 +82,7 @@ describe('ApplicationUserController tests', () => {
     // Act /Assert
     await client
       .patch('/api/applicationusers/' + req.id)
+      .set('Authorization', 'Bearer ' + token)
       .send(req)
       .expect(204);
   });
@@ -76,15 +94,11 @@ describe('ApplicationUserController tests', () => {
     // Act
     const res = await client
       .delete('/api/applicationusers/' + req.id)
+      .set('Authorization', 'Bearer ' + token)
       .send(req)
       .expect(204);
 
     // Assert
     expect(res.body).empty();
   });
-
-  // Private helper functions
-  async function clearDatabase() {
-    await appUserRepo.deleteAll();
-  }
 });
