@@ -93,4 +93,13 @@ describe('Account-ApplicationController', () => {
     // Assert
     expect(getApplicationByIdRes.body === getAllApplicationsFilteredRes.body);
   });
+
+  it('Get Applications returns an error when JWT token is not provided', async () => {
+    // Act
+    const res = await client.get('/api/accounts/1/applications');
+
+    // Arrange
+    expect(res.status).to.equal(401);
+    expect(res.body.error.message).to.equal('Authorization header not found');
+  });
 });
