@@ -26,7 +26,7 @@ describe('AccountController', () => {
     await app.stop();
   });
 
-  it('creates new account when POST /accounts/register is invoked', async () => {
+  it(`POST '/accounts/register' creates a new account`, async () => {
     // Arrange
     const req = {...accountData};
 
@@ -44,7 +44,7 @@ describe('AccountController', () => {
   describe('Login', () => {
     const credentialsError = 'Incorrect login credentials';
 
-    it('login returns a JWT token when successful', async () => {
+    it(`POST '/accounts/login' returns a JWT token when successful`, async () => {
       // Arrange
       const req: Credentials = {
         username: accountData.username,
@@ -60,7 +60,7 @@ describe('AccountController', () => {
       expect(res.body.token).to.not.be.empty();
     });
 
-    it('login returns an error with non-existent username', async () => {
+    it(`POST '/accounts/login' returns an error with non-existent username`, async () => {
       // Arrange
       const req: Credentials = {
         username: 'wronggg!!',
@@ -75,7 +75,7 @@ describe('AccountController', () => {
       expect(res.body.error.message).to.equal(credentialsError);
     });
 
-    it('login returns an error with incorrect password', async () => {
+    it(`POST '/accounts/login' returns an error with incorrect password`, async () => {
       // Arrange
       const req: Credentials = {
         username: accountData.username,
@@ -88,6 +88,32 @@ describe('AccountController', () => {
       // Assert
       expect(res.status).to.equal(401); // Unauthorized
       expect(res.body.error.message).to.equal(credentialsError);
+    });
+
+    it(`GET '/accounts' returns all accounts when a valid JWT token is provided`, async () => {
+      // Arrange
+      let res = await client.post('/api/accounts/login').send({
+        username: accountData.username,
+        password: accountData.password,
+      });
+      const token = res.body.token;
+
+      // Act
+      res = await client
+        .get('/api/accounts')
+        .set('Authorization', 'Bearer ' + token);
+
+      // Assert
+      expect(res.status).to.equal(200);
+    });
+
+    it(`GET '/accounts' returns an error when a JWT token is not provided`, async () => {
+      // Act
+      const res = await client.get('/api/accounts');
+
+      // Assert
+      expect(res.status).to.equal(401);
+      expect(res.body.error.message).to.equal('Authorization header not found');
     });
   });
 
