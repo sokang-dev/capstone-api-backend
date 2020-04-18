@@ -1,7 +1,11 @@
 import {Client, expect} from '@loopback/testlab';
 import {OtpGeneratorApplication} from '../..';
 import {ApplicationRepository} from '../../repositories';
-import {setupApplication} from './test-helper';
+import {
+  setupApplication,
+  setupApplicatioRepositories,
+  clearDatabase,
+} from './test-helper';
 
 describe('ApplicationController', () => {
   let app: OtpGeneratorApplication;
@@ -15,11 +19,17 @@ describe('ApplicationController', () => {
     otpLifetime: 60,
   };
 
-  before('setupApplication', async () => {
+  before('Setup Application', async () => {
     ({app, client} = await setupApplication());
-    applicationRepo = await app.getRepository(ApplicationRepository);
   });
-  beforeEach(clearDatabase);
+
+  before('Setup Repositories', async () => {
+    ({applicationRepo} = await setupApplicatioRepositories(app));
+  });
+
+  beforeEach('Clear Database', async () => {
+    await clearDatabase(app);
+  });
 
   after(async () => {
     await app.stop();
@@ -90,9 +100,4 @@ describe('ApplicationController', () => {
     // Assert
     await client.get('/api/applications').expect(200);
   });
-
-  // Private helper functions
-  async function clearDatabase() {
-    await applicationRepo.deleteAll();
-  }
 });

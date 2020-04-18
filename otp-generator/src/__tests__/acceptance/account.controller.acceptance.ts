@@ -141,9 +141,4 @@ describe('AccountController', () => {
       );
     });
   });
-
-  // Private helper functions
-  // async function clearDatabase() {
-  //   await accountRepo.deleteAll();
-  // }
 });
