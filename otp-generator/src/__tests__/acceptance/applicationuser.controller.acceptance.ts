@@ -58,6 +58,18 @@ describe('ApplicationUserController tests', () => {
     expect(res.body.mobileNumber).to.equal('04162811');
   });
 
+  it('Get app user by id returns an error when a JWT token is not provided', async () => {
+    // Arrange
+    const req = {...appUserData};
+
+    // Act
+    const res = await client.get('/api/applicationusers/' + req.id).send(req);
+
+    // Assert
+    expect(res.status).to.equal(401);
+    expect(res.body.error.message).to.equal('Authorization header not found');
+  });
+
   it('Get app user by id', async () => {
     // Arrange
     const req = {...appUserData};
