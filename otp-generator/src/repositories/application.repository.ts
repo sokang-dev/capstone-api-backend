@@ -1,13 +1,19 @@
+import {Getter, inject} from '@loopback/core';
 import {
-  DefaultCrudRepository,
   BelongsToAccessor,
-  repository,
+  DefaultCrudRepository,
+  HasManyRepositoryFactory,
   juggler,
+  repository,
 } from '@loopback/repository';
-import {inject, Getter} from '@loopback/core';
-
-import {Application, ApplicationRelations, Account} from '../models';
+import {
+  Account,
+  Application,
+  ApplicationRelations,
+  Applicationuser,
+} from '../models';
 import {AccountRepository} from './account.repository';
+import {ApplicationuserRepository} from './applicationuser.repository';
 
 export class ApplicationRepository extends DefaultCrudRepository<
   Application,
@@ -19,16 +25,27 @@ export class ApplicationRepository extends DefaultCrudRepository<
     typeof Application.prototype.id
   >;
 
+  public readonly applicationusers: HasManyRepositoryFactory<
+    Applicationuser,
+    typeof Application.prototype.id
+  >;
+
   constructor(
     @inject('datasources.db') dataSource: juggler.DataSource,
     @repository.getter(AccountRepository)
     accountRepositoryGetter: Getter<AccountRepository>,
+    @repository.getter('ApplicationuserRepository')
+    applicationuserGetter: Getter<ApplicationuserRepository>,
   ) {
     super(Application, dataSource);
 
     this.account = this.createBelongsToAccessorFor(
       'account',
       accountRepositoryGetter,
+    );
+    this.applicationusers = this.createHasManyRepositoryFactoryFor(
+      'applicationusers',
+      applicationuserGetter,
     );
   }
 
