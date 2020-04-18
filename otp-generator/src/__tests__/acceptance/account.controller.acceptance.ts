@@ -1,7 +1,11 @@
 import {Client, expect} from '@loopback/testlab';
 
 import {OtpGeneratorApplication} from '../..';
-import {setupApplication} from './test-helper';
+import {
+  setupApplication,
+  setupAccountRepositories,
+  clearDatabase,
+} from './test-helper';
 import {AccountRepository} from '../../repositories';
 import {Credentials} from '../../models';
 
@@ -16,11 +20,17 @@ describe('AccountController', () => {
     apikey: 'secretkey',
   };
 
-  before('setupApplication', async () => {
+  before('Setup Application', async () => {
     ({app, client} = await setupApplication());
-    accountRepo = await app.getRepository(AccountRepository);
   });
-  before(clearDatabase);
+
+  before('Setup Repositories', async () => {
+    ({accountRepo} = await setupAccountRepositories(app));
+  });
+
+  before('Clear Database', async () => {
+    await clearDatabase(app);
+  });
 
   after(async () => {
     await app.stop();
@@ -133,7 +143,7 @@ describe('AccountController', () => {
   });
 
   // Private helper functions
-  async function clearDatabase() {
-    await accountRepo.deleteAll();
-  }
+  // async function clearDatabase() {
+  //   await accountRepo.deleteAll();
+  // }
 });
