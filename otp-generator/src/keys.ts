@@ -1,12 +1,10 @@
-import {BindingKey} from '@loopback/core';
 import {TokenService, UserService} from '@loopback/authentication';
-
+import {BindingKey} from '@loopback/core';
 import {Account, Credentials} from './models';
 
 export namespace JWTServiceConstants {
-  export const JWT_SECRET_VALUE = process.env.JWT_SECRET ?? 'otpgen217';
-
-  export const JWT_LIFESPAN_VALUE = process.env.JWT_LIFESPAN ?? '600';
+  export const JWT_SECRET_VALUE = process.env.JWT_SECRET || 'otpgen217';
+  export const JWT_LIFESPAN_VALUE = process.env.JWT_LIFESPAN || '600';
 }
 
 export namespace JWTServiceBindings {
