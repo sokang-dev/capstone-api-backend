@@ -81,6 +81,11 @@ export class Account extends TimestampEntity {
   }
 }
 
+export type Credentials = {
+  username: string;
+  password: string;
+};
+
 export interface AccountRelations {
   applications: ApplicationWithRelations[];
 }
