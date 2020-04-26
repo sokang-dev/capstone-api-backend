@@ -16,6 +16,7 @@ export class Application extends TimestampEntity {
     precision: 10,
     scale: 0,
     id: true,
+    generated: true,
     mysql: {
       columnName: 'id',
       dataType: 'int',

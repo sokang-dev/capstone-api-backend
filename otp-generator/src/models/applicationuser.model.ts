@@ -1,6 +1,6 @@
-import {model, property, belongsTo} from '@loopback/repository';
-import {TimestampEntity} from './TimestampEntity.model';
+import {belongsTo, model, property} from '@loopback/repository';
 import {Application} from './application.model';
+import {TimestampEntity} from './TimestampEntity.model';
 
 @model({
   settings: {
@@ -15,6 +15,7 @@ export class Applicationuser extends TimestampEntity {
     precision: 10,
     scale: 0,
     id: true,
+    generated: true,
     mysql: {
       columnName: 'id',
       dataType: 'int',
