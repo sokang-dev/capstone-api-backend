@@ -12,6 +12,8 @@ import {Applicationuser} from '../models';
 import {ApplicationuserRepository} from '../repositories';
 import {authenticate} from '@loopback/authentication';
 
+import speakeasy from 'speakeasy';
+
 @authenticate('jwt')
 export class ApplicationuserController {
   constructor(
@@ -42,6 +44,8 @@ export class ApplicationuserController {
     })
     applicationuser: Applicationuser,
   ): Promise<Applicationuser> {
+    const secret = speakeasy.generateSecret();
+    applicationuser.userSecret = secret.base32;
     return this.applicationuserRepository.create(applicationuser);
   }
 

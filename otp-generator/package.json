@@ -57,10 +57,12 @@
     "@loopback/security": "0.2.4",
     "@loopback/service-proxy": "2.0.4",
     "@types/bcrypt": "3.0.0",
+    "@types/speakeasy": "^2.0.5",
     "bcrypt": "4.0.1",
     "dotenv": "8.2.0",
     "jsonwebtoken": "8.5.1",
     "loopback-connector-mysql": "5.4.3",
+    "speakeasy": "^2.0.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
