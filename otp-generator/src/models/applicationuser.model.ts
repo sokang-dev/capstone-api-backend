@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/camelcase: 0 */
+
 import {belongsTo, model, property} from '@loopback/repository';
 import {Application} from './application.model';
 import {TimestampEntity} from './TimestampEntity.model';
