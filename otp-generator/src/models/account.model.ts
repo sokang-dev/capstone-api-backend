@@ -18,7 +18,6 @@ export class Account extends TimestampEntity {
     id: true,
     generated: true,
     mysql: {
-      columnName: 'id',
       dataType: 'int',
       dataLength: null,
       dataPrecision: 10,
@@ -33,7 +32,6 @@ export class Account extends TimestampEntity {
     required: true,
     length: 255,
     mysql: {
-      columnName: 'username',
       dataType: 'varchar',
       dataLength: 255,
       dataPrecision: null,
@@ -51,7 +49,6 @@ export class Account extends TimestampEntity {
     required: true,
     length: 255,
     mysql: {
-      columnName: 'password',
       dataType: 'varchar',
       dataLength: 255,
       dataPrecision: null,
@@ -66,7 +63,6 @@ export class Account extends TimestampEntity {
     required: true,
     length: 255,
     mysql: {
-      columnName: 'apikey',
       dataType: 'varchar',
       dataLength: 255,
       dataPrecision: null,

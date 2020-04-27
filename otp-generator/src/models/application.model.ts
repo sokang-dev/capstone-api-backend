@@ -7,6 +7,14 @@ import {TimestampEntity} from './TimestampEntity.model';
   settings: {
     idInjection: false,
     mysql: {schema: 'otpgen', table: 'application'},
+    foreignKeys: {
+      fk_application_accountId: {
+        name: 'fk_application_accountId',
+        entity: 'Account',
+        entityKey: 'id',
+        foreignKey: 'accountId',
+      },
+    },
   },
 })
 export class Application extends TimestampEntity {
@@ -18,7 +26,6 @@ export class Application extends TimestampEntity {
     id: true,
     generated: true,
     mysql: {
-      columnName: 'id',
       dataType: 'int',
       dataLength: null,
       dataPrecision: 10,
@@ -33,7 +40,6 @@ export class Application extends TimestampEntity {
     required: true,
     length: 255,
     mysql: {
-      columnName: 'application_name',
       dataType: 'varchar',
       dataLength: 255,
       dataPrecision: null,
@@ -43,14 +49,7 @@ export class Application extends TimestampEntity {
   })
   applicationName: string;
 
-  @belongsTo(
-    () => Account,
-    {
-      keyFrom: 'Application.accountId',
-      keyTo: 'Account.Id',
-    },
-    {name: 'account_id'},
-  )
+  @belongsTo(() => Account)
   accountId: number;
 
   @property({
@@ -59,7 +58,6 @@ export class Application extends TimestampEntity {
     precision: 10,
     scale: 0,
     mysql: {
-      columnName: 'otp_length',
       dataType: 'int',
       dataLength: null,
       dataPrecision: 10,
@@ -75,7 +73,6 @@ export class Application extends TimestampEntity {
     precision: 10,
     scale: 0,
     mysql: {
-      columnName: 'otp_lifetime',
       dataType: 'int',
       dataLength: null,
       dataPrecision: 10,
@@ -85,7 +82,7 @@ export class Application extends TimestampEntity {
   })
   otpLifetime: number;
 
-  @hasMany(() => Applicationuser, {keyTo: 'Application.Id'})
+  @hasMany(() => Applicationuser)
   applicationusers?: Applicationuser[];
 
   constructor(data?: Partial<Application>) {
