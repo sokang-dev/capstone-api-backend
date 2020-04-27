@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/camelcase: 0 */
+
 import {belongsTo, hasMany, model, property} from '@loopback/repository';
 import {Account, AccountWithRelations} from './account.model';
 import {Applicationuser} from './applicationuser.model';
