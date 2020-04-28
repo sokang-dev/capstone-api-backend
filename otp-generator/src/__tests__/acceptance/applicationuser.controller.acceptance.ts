@@ -9,8 +9,6 @@ import {
 } from './test-helper';
 import {Account} from '../../models';
 
-import speakeasy from 'speakeasy';
-
 describe('ApplicationUserController tests', () => {
   let app: OtpGeneratorApplication;
   let client: Client;
@@ -22,12 +20,9 @@ describe('ApplicationUserController tests', () => {
     apikey: 'secretkey',
   };
 
-  let secret = generateUserSecret();
-
   const appUserData = {
     email: 'johnsmith@gmail.com',
     mobileNumber: '04162811',
-    userSecret: secret,
     id: 1,
   };
 
@@ -47,14 +42,10 @@ describe('ApplicationUserController tests', () => {
 
   it('Create app user', async () => {
     // Arrange
-    const req = Object.assign(
-      {},
-      {
-        email: appUserData.email,
-        mobileNumber: appUserData.mobileNumber,
-        userSecret: appUserData.userSecret,
-      },
-    );
+    const req = {
+      email: appUserData.email,
+      mobileNumber: appUserData.mobileNumber,
+    };
 
     // Act
     const res = await client
@@ -70,10 +61,10 @@ describe('ApplicationUserController tests', () => {
 
   it('Get app user by id returns an error when JWT token is not provided', async () => {
     // Arrange
-    const req = Object.assign(
-      {},
-      {email: appUserData.email, mobileNumber: appUserData.mobileNumber},
-    );
+    const req = {
+      email: appUserData.email,
+      mobileNumber: appUserData.mobileNumber,
+    };
 
     // Act
     const res = await client
@@ -87,10 +78,10 @@ describe('ApplicationUserController tests', () => {
 
   it('Get app user by id', async () => {
     // Arrange
-    const req = Object.assign(
-      {},
-      {email: appUserData.email, mobileNumber: appUserData.mobileNumber},
-    );
+    const req = {
+      email: appUserData.email,
+      mobileNumber: appUserData.mobileNumber,
+    };
 
     // Act
     const res = await client
@@ -106,10 +97,10 @@ describe('ApplicationUserController tests', () => {
 
   it('Partial update of app user email by id', async () => {
     //Arrange
-    const req = Object.assign(
-      {},
-      {email: appUserData.email, mobileNumber: appUserData.mobileNumber},
-    );
+    const req = {
+      email: appUserData.email,
+      mobileNumber: appUserData.mobileNumber,
+    };
 
     req.email = 'johnsmith23@gmail.com';
 
@@ -132,24 +123,23 @@ describe('ApplicationUserController tests', () => {
 
   it('Delete app user by id', async () => {
     // Arrange
-    const req = Object.assign(
-      {},
-      {email: appUserData.email, mobileNumber: appUserData.mobileNumber},
-    );
+    const req = {
+      email: appUserData.email,
+      mobileNumber: appUserData.mobileNumber,
+    };
 
     // Act
-    const res = await client
+    await client
       .delete('/api/applicationusers/' + appUserData.id)
       .set('Authorization', 'Bearer ' + token)
       .send(req)
       .expect(204);
 
-    // Assert
-    expect(res.body).empty();
+    //Assert
+    await client
+      .get('/api/applicationusers/' + appUserData.id)
+      .set('Authorization', 'Bearer ' + token)
+      .send(req)
+      .expect(404);
   });
-
-  function generateUserSecret() {
-    let userSecret = speakeasy.generateSecret();
-    return String(userSecret);
-  }
 });

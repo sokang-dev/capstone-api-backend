@@ -112,3 +112,9 @@ export interface ApplicationuserRelations {
 
 export type ApplicationuserWithRelations = Applicationuser &
   ApplicationuserRelations;
+
+export class PartialApplicationuser {
+  constructor(partialAppUser: Partial<Applicationuser>) {
+    return {...partialAppUser};
+  }
+}

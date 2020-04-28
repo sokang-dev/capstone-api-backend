@@ -8,7 +8,7 @@ import {
   del,
   requestBody,
 } from '@loopback/rest';
-import {Applicationuser} from '../models';
+import {Applicationuser, PartialApplicationuser} from '../models';
 import {ApplicationuserRepository} from '../repositories';
 import {authenticate} from '@loopback/authentication';
 
@@ -36,7 +36,7 @@ export class ApplicationuserController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Applicationuser, {
+          schema: getModelSchemaRef(PartialApplicationuser, {
             title: 'NewApplicationuser',
           }),
         },
