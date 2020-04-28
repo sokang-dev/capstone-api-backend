@@ -69,6 +69,9 @@ export class AccountController {
             schema: {
               type: 'object',
               properties: {
+                userProfile: {
+                  type: 'object',
+                },
                 token: {
                   type: 'string',
                 },
@@ -99,7 +102,7 @@ export class AccountController {
       },
     })
     credentials: Credentials,
-  ): Promise<{token: string}> {
+  ): Promise<object> {
     // Verify account exists and password is correct
     const account = await this.accountService.verifyCredentials(credentials);
 
@@ -109,7 +112,10 @@ export class AccountController {
     // Create a JWT
     const token = await this.jwtService.generateToken(userProfile);
 
-    return {token};
+    return {
+      userProfile,
+      token,
+    };
   }
 
   // Get all accounts

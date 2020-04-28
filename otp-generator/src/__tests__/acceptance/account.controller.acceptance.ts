@@ -56,6 +56,7 @@ describe('AccountController', () => {
 
       // Assert
       expect(res.status).to.equal(200);
+      expect(res.body).to.have.property('userProfile');
       expect(res.body).to.have.property('token');
       expect(res.body.token).to.not.be.empty();
     });
