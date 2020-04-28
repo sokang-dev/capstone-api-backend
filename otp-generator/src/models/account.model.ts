@@ -1,7 +1,6 @@
-import {model, property, hasMany} from '@loopback/repository';
-
-import {TimestampEntity} from './TimestampEntity.model';
+import {hasMany, model, property} from '@loopback/repository';
 import {Application, ApplicationWithRelations} from './application.model';
+import {TimestampEntity} from './TimestampEntity.model';
 
 @model({
   settings: {
@@ -17,8 +16,8 @@ export class Account extends TimestampEntity {
     precision: 10,
     scale: 0,
     id: true,
+    generated: true,
     mysql: {
-      columnName: 'id',
       dataType: 'int',
       dataLength: null,
       dataPrecision: 10,
@@ -33,12 +32,14 @@ export class Account extends TimestampEntity {
     required: true,
     length: 255,
     mysql: {
-      columnName: 'username',
       dataType: 'varchar',
       dataLength: 255,
       dataPrecision: null,
       dataScale: null,
       nullable: 'N',
+    },
+    index: {
+      unique: true,
     },
   })
   username: string;
@@ -48,7 +49,6 @@ export class Account extends TimestampEntity {
     required: true,
     length: 255,
     mysql: {
-      columnName: 'password',
       dataType: 'varchar',
       dataLength: 255,
       dataPrecision: null,
@@ -63,7 +63,6 @@ export class Account extends TimestampEntity {
     required: true,
     length: 255,
     mysql: {
-      columnName: 'apikey',
       dataType: 'varchar',
       dataLength: 255,
       dataPrecision: null,
