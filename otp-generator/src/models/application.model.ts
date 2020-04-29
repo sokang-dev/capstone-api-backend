@@ -55,25 +55,23 @@ export class Application extends TimestampEntity {
   accountId: number;
 
   @property({
-    type: 'number',
-    required: true,
-    precision: 10,
-    scale: 0,
+    type: 'string',
+    required: false,
+    length: 255,
     mysql: {
-      dataType: 'int',
-      dataLength: null,
-      dataPrecision: 10,
-      dataScale: 0,
-      nullable: 'N',
+      dataType: 'varchar',
+      dataLength: 255,
+      nullable: 'Y',
     },
   })
-  otpLength: number;
+  applicationDescription?: string;
 
   @property({
     type: 'number',
-    required: true,
+    required: false,
     precision: 10,
     scale: 0,
+    default: 6,
     mysql: {
       dataType: 'int',
       dataLength: null,
@@ -82,7 +80,23 @@ export class Application extends TimestampEntity {
       nullable: 'N',
     },
   })
-  otpLifetime: number;
+  otpLength?: number;
+
+  @property({
+    type: 'number',
+    required: false,
+    precision: 10,
+    scale: 0,
+    default: 60,
+    mysql: {
+      dataType: 'int',
+      dataLength: null,
+      dataPrecision: 10,
+      dataScale: 0,
+      nullable: 'N',
+    },
+  })
+  otpLifetime?: number;
 
   @hasMany(() => Applicationuser)
   applicationusers?: Applicationuser[];
