@@ -13,7 +13,7 @@ import * as bcrypt from 'bcrypt';
 import {UserService, authenticate} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 
-import {Account, Credentials} from '../models';
+import {Account, Credentials, AccountDto} from '../models';
 import {AccountRepository} from '../repositories';
 import {AccountServiceBindings, JWTServiceBindings} from '../keys';
 import {JwtService} from '../services';
@@ -52,7 +52,7 @@ export class AccountController {
         },
       },
     })
-    account: Omit<Account, 'id'>,
+    account: AccountDto,
   ): Promise<Account> {
     // Hash password
     account.password = bcrypt.hashSync(account.password, this.saltRounds);
@@ -178,7 +178,7 @@ export class AccountController {
         },
       },
     })
-    account: Account,
+    account: AccountDto,
   ): Promise<void> {
     console.log(account);
     // If password is being updated
@@ -188,21 +188,6 @@ export class AccountController {
     }
 
     await this.accountRepository.updateById(id, account);
-  }
-
-  // Full update account by id
-  @put('/accounts/{id}', {
-    responses: {
-      '204': {
-        description: 'Account PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() account: Account,
-  ): Promise<void> {
-    await this.accountRepository.replaceById(id, account);
   }
 
   @del('/accounts/{id}', {

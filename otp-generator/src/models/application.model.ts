@@ -80,7 +80,7 @@ export class Application extends TimestampEntity {
       nullable: 'N',
     },
   })
-  otpLength?: number;
+  otpLength: number;
 
   @property({
     type: 'number',
@@ -96,7 +96,7 @@ export class Application extends TimestampEntity {
       nullable: 'N',
     },
   })
-  otpLifetime?: number;
+  otpLifetime: number;
 
   @hasMany(() => Applicationuser)
   applicationusers?: Applicationuser[];
