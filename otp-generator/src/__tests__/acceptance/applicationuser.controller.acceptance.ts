@@ -1,13 +1,12 @@
 import {Client, expect} from '@loopback/testlab';
-
 import {OtpGeneratorApplication} from '../..';
+import {Account} from '../../models';
 import {
-  setupApplication,
+  authenticateAnAccount,
   clearDatabase,
   registerAnAccount,
-  authenticateAnAccount,
+  setupApplication,
 } from './test-helper';
-import {Account} from '../../models';
 
 describe('ApplicationUserController tests', () => {
   let app: OtpGeneratorApplication;
@@ -43,7 +42,11 @@ describe('ApplicationUserController tests', () => {
 
   it('Create app user', async () => {
     // Arrange
-    const req = appUserData;
+    const req = {
+      email: appUserData.email,
+      userSecret: appUserData.userSecret,
+      mobileNumber: appUserData.mobileNumber,
+    };
 
     // Act
     const res = await client
