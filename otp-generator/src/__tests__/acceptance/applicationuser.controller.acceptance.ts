@@ -57,6 +57,7 @@ describe('ApplicationUserController tests', () => {
     // Assert
     expect(res.body.email).to.equal('johnsmith@gmail.com');
     expect(res.body.mobileNumber).to.equal('04162811');
+    expect(res.body.userSecret).not.empty();
   });
 
   it('Get app user by id returns an error when JWT token is not provided', async () => {
@@ -93,6 +94,7 @@ describe('ApplicationUserController tests', () => {
     // Assert
     expect(res.body.email).to.equal('johnsmith@gmail.com');
     expect(res.body.mobileNumber).to.equal('04162811');
+    expect(res.body.userSecret).not.empty();
   });
 
   it('Partial update of app user email by id', async () => {
