@@ -9,6 +9,13 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {AuthenticationComponent} from '@loopback/authentication';
+import {
+  AuthorizationComponent,
+  AuthorizationTags,
+  AuthorizationOptions,
+  AuthorizationDecision,
+  AuthorizationBindings,
+} from '@loopback/authorization';
 
 import {MySequence} from './sequence';
 import {
@@ -18,6 +25,7 @@ import {
 } from './keys';
 import {JwtService, AccountService} from './services';
 import {JWTAuthenticationStrategy} from './jwt-strategy';
+import {BasicAuthorizer} from './services/authorizer.service';
 
 export class OtpGeneratorApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -26,10 +34,6 @@ export class OtpGeneratorApplication extends BootMixin(
     super(options);
 
     this.setupBindings();
-
-    // Load authentication component
-    this.component(AuthenticationComponent);
-    this.add(createBindingFromClass(JWTAuthenticationStrategy));
 
     // Set up the custom sequence
     this.sequence(MySequence);
@@ -72,5 +76,24 @@ export class OtpGeneratorApplication extends BootMixin(
 
     // Bind Account service
     this.bind(AccountServiceBindings.ACCOUNT_SERVICE).toClass(AccountService);
+  }
+
+  setupAuth(): void {
+    // Load authentication component
+    this.component(AuthenticationComponent);
+    this.add(createBindingFromClass(JWTAuthenticationStrategy));
+
+    // Load authorisation component
+    const authorizationOptions: AuthorizationOptions = {
+      // Default decision if all authorizers vote for ABSTAIN
+      defaultDecision: AuthorizationDecision.DENY,
+      // Deny vote will take precedence and override other votes
+      precedence: AuthorizationDecision.DENY,
+    };
+    this.configure(AuthorizationBindings.COMPONENT).to(authorizationOptions);
+    this.component(AuthorizationComponent);
+    this.bind('authorizationProviders.basic-authorizer')
+      .toProvider(BasicAuthorizer)
+      .tag(AuthorizationTags.AUTHORIZER);
   }
 }

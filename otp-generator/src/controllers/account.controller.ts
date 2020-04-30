@@ -10,14 +10,17 @@ import {
 } from '@loopback/rest';
 import * as bcrypt from 'bcrypt';
 import {UserService, authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/core';
 
 import {Account, Credentials, AccountDto} from '../models';
 import {AccountRepository} from '../repositories';
 import {AccountServiceBindings, JWTServiceBindings} from '../keys';
 import {JwtService} from '../services';
+import {compareAccountId} from '../services/authorizer.service';
 
 @authenticate('jwt')
+@authorize({voters: [compareAccountId]})
 export class AccountController {
   constructor(
     @repository(AccountRepository)
@@ -41,6 +44,7 @@ export class AccountController {
     },
   })
   @authenticate.skip()
+  @authorize.skip()
   async register(
     @requestBody({
       content: {
@@ -82,6 +86,7 @@ export class AccountController {
     },
   })
   @authenticate.skip()
+  @authorize.skip()
   async login(
     @requestBody({
       content: {
