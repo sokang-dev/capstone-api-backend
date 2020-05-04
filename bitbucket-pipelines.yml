@@ -6,11 +6,13 @@
 image: node:10.15.3
 
 pipelines:
-  default:
-    - step:
-        caches:
-          - node
-        script: # Modify the commands below to build your repository.
-          - cd OneTimePasswordGenerator
-          - npm install
-          - npm test
+  pull-requests:
+    '**':
+      - step:
+          name: Build and run tests
+          caches:
+            - node
+          script:
+            - cd otp-generator
+            - npm install
+            - npm run test # triggers clean and build before running the tests
