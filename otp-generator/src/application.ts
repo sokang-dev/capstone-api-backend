@@ -35,6 +35,9 @@ export class OtpGeneratorApplication extends BootMixin(
 
     this.setupBindings();
 
+    // Setup Authentication and Authorization
+    this.setupAuth();
+
     // Set up the custom sequence
     this.sequence(MySequence);
 

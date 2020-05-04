@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {Filter, FilterExcludingWhere, repository} from '@loopback/repository';
 import {
   del,
@@ -10,7 +12,7 @@ import {
 } from '@loopback/rest';
 import {Application} from '../models';
 import {ApplicationRepository} from '../repositories';
-import {authenticate} from '@loopback/authentication';
+import {compareAccountId} from '../services/authorizer.service';
 
 @authenticate('jwt')
 export class ApplicationController {
@@ -19,6 +21,7 @@ export class ApplicationController {
     public applicationRepository: ApplicationRepository,
   ) {}
 
+  // Create an application
   @post('/applications', {
     responses: {
       '200': {
@@ -27,6 +30,7 @@ export class ApplicationController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
   async create(
     @requestBody({
       content: {
@@ -43,6 +47,7 @@ export class ApplicationController {
     return this.applicationRepository.create(application);
   }
 
+  // Get all applications
   @get('/applications', {
     responses: {
       '200': {
@@ -58,12 +63,14 @@ export class ApplicationController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin'], voters: [compareAccountId]})
   async find(
     @param.filter(Application) filter?: Filter<Application>,
   ): Promise<Application[]> {
     return this.applicationRepository.find(filter);
   }
 
+  // Get an application by application id
   @get('/applications/{id}', {
     responses: {
       '200': {
@@ -76,6 +83,7 @@ export class ApplicationController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
   async findById(
     @param.path.number('id') id: number,
     @param.filter(Application, {exclude: 'where'})
@@ -84,6 +92,7 @@ export class ApplicationController {
     return this.applicationRepository.findById(id, filter);
   }
 
+  // Partial update application by application id
   @patch('/applications/{id}', {
     responses: {
       '204': {
@@ -91,6 +100,7 @@ export class ApplicationController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -105,6 +115,7 @@ export class ApplicationController {
     await this.applicationRepository.updateById(id, application);
   }
 
+  // Delete application by application id
   @del('/applications/{id}', {
     responses: {
       '204': {
@@ -112,6 +123,7 @@ export class ApplicationController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.applicationRepository.deleteById(id);
   }

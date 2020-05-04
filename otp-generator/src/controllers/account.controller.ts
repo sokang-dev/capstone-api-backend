@@ -1,26 +1,24 @@
+import {authenticate, UserService} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {inject} from '@loopback/core';
 import {Filter, FilterExcludingWhere, repository} from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
-  del,
+  post,
   requestBody,
 } from '@loopback/rest';
 import * as bcrypt from 'bcrypt';
-import {UserService, authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
-import {inject} from '@loopback/core';
-
-import {Account, Credentials, AccountDto} from '../models';
-import {AccountRepository} from '../repositories';
 import {AccountServiceBindings, JWTServiceBindings} from '../keys';
+import {Account, AccountDto, Credentials} from '../models';
+import {AccountRepository} from '../repositories';
 import {JwtService} from '../services';
 import {compareAccountId} from '../services/authorizer.service';
 
 @authenticate('jwt')
-@authorize({voters: [compareAccountId]})
 export class AccountController {
   constructor(
     @repository(AccountRepository)
@@ -138,6 +136,7 @@ export class AccountController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin'], voters: [compareAccountId]})
   async find(
     @param.filter(Account) filter?: Filter<Account>,
   ): Promise<Account[]> {
@@ -157,6 +156,7 @@ export class AccountController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
   async findById(
     @param.path.number('id') id: number,
     @param.filter(Account, {exclude: 'where'})
@@ -173,6 +173,7 @@ export class AccountController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -201,6 +202,7 @@ export class AccountController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.accountRepository.deleteById(id);
   }
