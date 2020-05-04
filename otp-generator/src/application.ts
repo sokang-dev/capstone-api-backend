@@ -1,30 +1,29 @@
+import {AuthenticationComponent} from '@loopback/authentication';
+import {
+  AuthorizationBindings,
+  AuthorizationComponent,
+  AuthorizationDecision,
+  AuthorizationOptions,
+  AuthorizationTags,
+} from '@loopback/authorization';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig, createBindingFromClass} from '@loopback/core';
+import {RepositoryMixin} from '@loopback/repository';
+import {RestApplication} from '@loopback/rest';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
-import {RepositoryMixin} from '@loopback/repository';
-import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
-import {AuthenticationComponent} from '@loopback/authentication';
-import {
-  AuthorizationComponent,
-  AuthorizationTags,
-  AuthorizationOptions,
-  AuthorizationDecision,
-  AuthorizationBindings,
-} from '@loopback/authorization';
-
-import {MySequence} from './sequence';
-import {
-  JWTServiceConstants,
-  JWTServiceBindings,
-  AccountServiceBindings,
-} from './keys';
-import {JwtService, AccountService} from './services';
 import {JWTAuthenticationStrategy} from './jwt-strategy';
+import {
+  AccountServiceBindings,
+  JWTServiceBindings,
+  JWTServiceConstants,
+} from './keys';
+import {MySequence} from './sequence';
+import {AccountService, JwtService} from './services';
 import {BasicAuthorizer} from './services/authorizer.service';
 
 export class OtpGeneratorApplication extends BootMixin(

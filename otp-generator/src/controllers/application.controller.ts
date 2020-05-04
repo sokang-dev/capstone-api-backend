@@ -12,7 +12,6 @@ import {
 } from '@loopback/rest';
 import {Application} from '../models';
 import {ApplicationRepository} from '../repositories';
-import {compareAccountId} from '../services/authorizer.service';
 
 @authenticate('jwt')
 export class ApplicationController {
@@ -30,7 +29,7 @@ export class ApplicationController {
       },
     },
   })
-  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
+  @authorize({allowedRoles: ['admin', 'user']})
   async create(
     @requestBody({
       content: {
@@ -63,7 +62,7 @@ export class ApplicationController {
       },
     },
   })
-  @authorize({allowedRoles: ['admin'], voters: [compareAccountId]})
+  @authorize({allowedRoles: ['admin']})
   async find(
     @param.filter(Application) filter?: Filter<Application>,
   ): Promise<Application[]> {
@@ -83,7 +82,7 @@ export class ApplicationController {
       },
     },
   })
-  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
+  @authorize({allowedRoles: ['admin', 'user']})
   async findById(
     @param.path.number('id') id: number,
     @param.filter(Application, {exclude: 'where'})
@@ -100,7 +99,7 @@ export class ApplicationController {
       },
     },
   })
-  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
+  @authorize({allowedRoles: ['admin', 'user']})
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -123,7 +122,7 @@ export class ApplicationController {
       },
     },
   })
-  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
+  @authorize({allowedRoles: ['admin', 'user']})
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.applicationRepository.deleteById(id);
   }

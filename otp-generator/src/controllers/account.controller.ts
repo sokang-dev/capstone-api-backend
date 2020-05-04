@@ -16,7 +16,6 @@ import {AccountServiceBindings, JWTServiceBindings} from '../keys';
 import {Account, AccountDto, Credentials} from '../models';
 import {AccountRepository} from '../repositories';
 import {JwtService} from '../services';
-import {compareAccountId} from '../services/authorizer.service';
 
 @authenticate('jwt')
 export class AccountController {
@@ -42,7 +41,6 @@ export class AccountController {
     },
   })
   @authenticate.skip()
-  @authorize.skip()
   async register(
     @requestBody({
       content: {
@@ -84,7 +82,6 @@ export class AccountController {
     },
   })
   @authenticate.skip()
-  @authorize.skip()
   async login(
     @requestBody({
       content: {
@@ -136,14 +133,14 @@ export class AccountController {
       },
     },
   })
-  @authorize({allowedRoles: ['admin'], voters: [compareAccountId]})
+  @authorize({allowedRoles: ['admin']})
   async find(
     @param.filter(Account) filter?: Filter<Account>,
   ): Promise<Account[]> {
     return this.accountRepository.find(filter);
   }
 
-  // Get account by id
+  // Get an account by account id
   @get('/accounts/{id}', {
     responses: {
       '200': {
@@ -156,7 +153,7 @@ export class AccountController {
       },
     },
   })
-  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
+  @authorize({allowedRoles: ['admin', 'user']})
   async findById(
     @param.path.number('id') id: number,
     @param.filter(Account, {exclude: 'where'})
@@ -165,7 +162,7 @@ export class AccountController {
     return this.accountRepository.findById(id, filter);
   }
 
-  // Partial update account by id
+  // Partial update an account by account id
   @patch('/accounts/{id}', {
     responses: {
       '204': {
@@ -173,7 +170,7 @@ export class AccountController {
       },
     },
   })
-  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
+  @authorize({allowedRoles: ['admin', 'user']})
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -195,6 +192,7 @@ export class AccountController {
     await this.accountRepository.updateById(id, account);
   }
 
+  // Delete an account by account id
   @del('/accounts/{id}', {
     responses: {
       '204': {
@@ -202,7 +200,7 @@ export class AccountController {
       },
     },
   })
-  @authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
+  @authorize({allowedRoles: ['admin', 'user']})
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.accountRepository.deleteById(id);
   }

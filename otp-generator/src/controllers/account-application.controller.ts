@@ -4,10 +4,9 @@ import {repository} from '@loopback/repository';
 import {get, param} from '@loopback/rest';
 import {Account, Application} from '../models';
 import {AccountRepository} from '../repositories';
-import {compareAccountId} from '../services/authorizer.service';
 
 @authenticate('jwt')
-@authorize({allowedRoles: ['admin', 'user'], voters: [compareAccountId]})
+@authorize({allowedRoles: ['admin', 'user']})
 export class AccountApplicationController {
   constructor(
     @repository(AccountRepository)

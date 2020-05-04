@@ -5,56 +5,175 @@ import {
   Authorizer,
 } from '@loopback/authorization';
 import {Provider} from '@loopback/core';
+import {repository} from '@loopback/repository';
 import {securityId, UserProfile} from '@loopback/security';
 import _ from 'lodash';
+import {
+  ApplicationRepository,
+  ApplicationuserRepository,
+} from '../repositories';
 
 export class BasicAuthorizer implements Provider<Authorizer> {
+  @repository(ApplicationRepository) appRepo: ApplicationRepository;
+  @repository(ApplicationuserRepository) appUserRepo: ApplicationuserRepository;
+
   value(): Authorizer {
     return this.authorize.bind(this);
   }
 
+  // Global authorisation policy
+  // This method will be invoked for all protected routes
   async authorize(
     context: AuthorizationContext,
     metadata: AuthorizationMetadata,
   ): Promise<AuthorizationDecision> {
-    return AuthorizationDecision.ALLOW;
-  }
-}
+    const currentUser: UserProfile | null = this.getUserProfile(context);
 
-// Voter - compare account id to determine accessibility
-export async function compareAccountId(
-  context: AuthorizationContext,
-): Promise<AuthorizationDecision> {
-  switch (context.invocationContext.targetClass.name) {
-    case 'AccountController':
-      break;
-    case 'ApplicationController':
-      break;
-    case 'ApplicationuserController':
-      break;
-    case 'AccountApplicationController':
-      break;
-    case 'ApplicationApplicationuserController':
-      break;
-  }
+    // Deny access if user is not found
+    if (!currentUser) {
+      return AuthorizationDecision.DENY;
+    }
 
-  let currentUser: UserProfile;
+    // Deny access if user does not have a role
+    if (!currentUser.role) {
+      return AuthorizationDecision.DENY;
+    }
 
-  if (context.principals.length > 0) {
-    const user = _.pick(context.principals[0], ['id', 'name']);
-    currentUser = {[securityId]: user.id, name: user.name};
-  } else {
+    // Allow access to admin role
+    if (currentUser.role === 'admin') return AuthorizationDecision.ALLOW;
+
+    // Allow access if user role is allowed for that endpoint
+    if (metadata.allowedRoles!.includes(currentUser.role))
+      return AuthorizationDecision.ALLOW;
+
+    // Check if models belong to current user
+    // Because of our current api routes design, have to resort to this hacky authorisation solution
+    switch (context.invocationContext.targetClass.name) {
+      case 'AccountController':
+        if (this.checkAccountIdInParam(currentUser, context))
+          return AuthorizationDecision.ALLOW;
+        break;
+
+      case 'ApplicationController':
+        if (
+          (await this.checkApplicationIdInParam(currentUser, context)) &&
+          this.checkAccountIdInRequest(currentUser, context)
+        )
+          return AuthorizationDecision.ALLOW;
+        break;
+
+      case 'ApplicationuserController':
+        if (
+          (await this.checkApplicationIdInRequest(currentUser, context)) &&
+          (await this.checkApplicationuserIdInParam(currentUser, context))
+        )
+          return AuthorizationDecision.ALLOW;
+        break;
+
+      case 'AccountApplicationController':
+        if (this.checkAccountIdInParam(currentUser, context))
+          return AuthorizationDecision.ALLOW;
+        break;
+
+      case 'ApplicationApplicationuserController':
+        if (await this.checkApplicationIdInParam(currentUser, context))
+          return AuthorizationDecision.ALLOW;
+        break;
+    }
+
+    // Deny access if all the conditions above do not met
     return AuthorizationDecision.DENY;
   }
 
-  const test = _.find(context.invocationContext.args, {
-    accountId: currentUser[securityId],
-  });
-  console.log(test);
+  // Fetch account information
+  getUserProfile(context: AuthorizationContext) {
+    let currentUser: UserProfile | null = null;
 
-  if (currentUser[securityId] === context.invocationContext.args[0]) {
-    return AuthorizationDecision.ALLOW;
+    if (context.principals.length > 0) {
+      const user = _.pick(context.principals[0], ['id', 'name', 'role']);
+      currentUser = {[securityId]: user.id, name: user.name, role: user.role};
+    }
+
+    return currentUser;
   }
 
-  return AuthorizationDecision.DENY;
+  checkAccountIdInParam(
+    currentUser: UserProfile,
+    context: AuthorizationContext,
+  ): boolean {
+    // Compare account id from param with current user id
+    if (currentUser[securityId] === context.invocationContext.args[0])
+      return true;
+
+    return false;
+  }
+
+  async checkApplicationIdInParam(
+    currentUser: UserProfile,
+    context: AuthorizationContext,
+  ): Promise<boolean> {
+    // Get appId from param
+    const appId = context.invocationContext.args[0];
+    // Check if the app is owned by current user
+    // app is null if it's not owned by current user
+    const app = await this.appRepo.findOne({
+      where: {
+        id: appId,
+        accountId: Number(currentUser[securityId]),
+      },
+    });
+
+    return !!app;
+  }
+
+  checkAccountIdInRequest(
+    currentUser: UserProfile,
+    context: AuthorizationContext,
+  ): boolean {
+    // Get the request body that contains account id
+    const req = _.find(context.invocationContext.args, o => o.accountId);
+
+    // Compare account id from the request body with current user id
+    if (req.accountId === currentUser[securityId]) return true;
+
+    return false;
+  }
+
+  async checkApplicationIdInRequest(
+    currentUser: UserProfile,
+    context: AuthorizationContext,
+  ): Promise<boolean> {
+    // Get the request body that contains application id
+    const req = _.find(context.invocationContext.args, o => o.applicationId);
+    // Check if the app is owned by current user
+    // app is null if it's not owned by current user
+    const app = await this.appRepo.findOne({
+      where: {
+        id: req.applicationId,
+        accountId: Number(currentUser[securityId]),
+      },
+    });
+
+    return !!app;
+  }
+
+  async checkApplicationuserIdInParam(
+    currentUser: UserProfile,
+    context: AuthorizationContext,
+  ): Promise<boolean> {
+    // Get appUserId from param
+    const appUserId = context.invocationContext.args[0];
+    // Get appId from appUserId
+    const appId = (await this.appUserRepo.findById(appUserId)).applicationId;
+    // Check if the app is owned by current user
+    // If the app is not owned by current user, app is null
+    const app = await this.appRepo.findOne({
+      where: {
+        id: appId,
+        accountId: Number(currentUser[securityId]),
+      },
+    });
+
+    return !!app;
+  }
 }
