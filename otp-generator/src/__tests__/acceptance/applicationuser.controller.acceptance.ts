@@ -1,15 +1,18 @@
 import {Client, expect} from '@loopback/testlab';
 import {OtpGeneratorApplication} from '../..';
-import {Account} from '../../models';
+import {Account, Application} from '../../models';
+import {ApplicationRepository} from '../../repositories';
 import {
   authenticateAnAccount,
   clearDatabase,
   registerAnAccount,
   setupApplication,
+  setupApplicationRepository,
 } from './test-helper';
 
 describe('ApplicationUserController tests', () => {
   let app: OtpGeneratorApplication;
+  let applicationRepo: ApplicationRepository;
   let client: Client;
   let token: string;
 
@@ -19,16 +22,24 @@ describe('ApplicationUserController tests', () => {
     apikey: 'secretkey',
   };
 
+  const appData: Partial<Application> = {
+    applicationName: 'test app',
+    accountId: 1,
+  };
+
   const appUserData = {
     email: 'johnsmith@gmail.com',
     userSecret: 'rNONHRni6BAk7y2TiKrv',
     mobileNumber: '04162811',
     id: 1,
+    applicationId: 1,
   };
 
   before('Setup application', async () => {
     ({app, client} = await setupApplication());
+    ({applicationRepo} = await setupApplicationRepository(app));
     await clearDatabase(app);
+    await createApp();
   });
 
   beforeEach('Get a valid JWT token', async () => {
@@ -46,6 +57,7 @@ describe('ApplicationUserController tests', () => {
       email: appUserData.email,
       userSecret: appUserData.userSecret,
       mobileNumber: appUserData.mobileNumber,
+      applicationId: 1,
     };
 
     // Act
@@ -66,7 +78,7 @@ describe('ApplicationUserController tests', () => {
     const req = {...appUserData};
 
     // Act
-    const res = await client.get('/api/applicationusers/' + req.id).send(req);
+    const res = await client.get('/api/applicationusers/' + req.id);
 
     // Assert
     expect(res.status).to.equal(401);
@@ -81,7 +93,6 @@ describe('ApplicationUserController tests', () => {
     const res = await client
       .get('/api/applicationusers/' + req.id)
       .set('Authorization', 'Bearer ' + token)
-      .send(req)
       .expect(200);
 
     // Assert
@@ -116,4 +127,8 @@ describe('ApplicationUserController tests', () => {
     // Assert
     expect(res.body).empty();
   });
+
+  async function createApp() {
+    await applicationRepo.create(appData);
+  }
 });

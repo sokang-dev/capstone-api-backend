@@ -56,7 +56,7 @@ export class BasicAuthorizer implements Provider<Authorizer> {
 
       case 'ApplicationController':
         if (
-          (await this.checkApplicationIdInParam(currentUser, context)) &&
+          (await this.checkApplicationIdInParam(currentUser, context)) ||
           this.checkAccountIdInRequest(currentUser, context)
         )
           return AuthorizationDecision.ALLOW;
@@ -64,7 +64,7 @@ export class BasicAuthorizer implements Provider<Authorizer> {
 
       case 'ApplicationuserController':
         if (
-          (await this.checkApplicationIdInRequest(currentUser, context)) &&
+          (await this.checkApplicationIdInRequest(currentUser, context)) ||
           (await this.checkApplicationuserIdInParam(currentUser, context))
         )
           return AuthorizationDecision.ALLOW;
@@ -114,6 +114,16 @@ export class BasicAuthorizer implements Provider<Authorizer> {
   ): Promise<boolean> {
     // Get appId from param
     const appId = context.invocationContext.args[0];
+
+    // Check if app exists for that id
+    // If it doesn't exists, return true to throw 404 error instead of 401 error
+    const appExists = await this.appRepo.findOne({
+      where: {
+        id: appId,
+      },
+    });
+    if (!appExists) return true;
+
     // Check if the app is owned by current user
     // app is null if it's not owned by current user
     const app = await this.appRepo.findOne({
@@ -133,6 +143,7 @@ export class BasicAuthorizer implements Provider<Authorizer> {
     // Get the request body that contains account id
     const req = _.find(context.invocationContext.args, o => o.accountId);
 
+    if (!req) return false;
     // Compare account id from the request body with current user id
     if (req.accountId === Number(currentUser[securityId])) return true;
 
@@ -144,7 +155,10 @@ export class BasicAuthorizer implements Provider<Authorizer> {
     context: AuthorizationContext,
   ): Promise<boolean> {
     // Get the request body that contains application id
-    const req = _.find(context.invocationContext.args, o => o.applicationId);
+    const req = _.find(context.invocationContext.args, o => o?.applicationId);
+
+    if (!req) return false;
+
     // Check if the app is owned by current user
     // app is null if it's not owned by current user
     const app = await this.appRepo.findOne({
@@ -165,6 +179,9 @@ export class BasicAuthorizer implements Provider<Authorizer> {
     const appUserId = context.invocationContext.args[0];
     // Get appId from appUserId
     const appId = (await this.appUserRepo.findById(appUserId)).applicationId;
+
+    if (!appId) return false;
+
     // Check if the app is owned by current user
     // If the app is not owned by current user, app is null
     const app = await this.appRepo.findOne({
