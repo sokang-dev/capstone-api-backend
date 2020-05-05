@@ -1,11 +1,9 @@
 import {Client, expect} from '@loopback/testlab';
+import * as bcrypt from 'bcrypt';
 import {OtpGeneratorApplication} from '../..';
-import {Account} from '../../models';
 import {AccountRepository, ApplicationRepository} from '../../repositories';
 import {
-  authenticateAnAccount,
   clearDatabase,
-  registerAnAccount,
   setupAccountRepository,
   setupApplication,
   setupApplicationRepository,
@@ -16,13 +14,6 @@ describe('Account-ApplicationController', () => {
   let client: Client;
   let accountRepo: AccountRepository;
   let applicationRepo: ApplicationRepository;
-  let token: string;
-
-  const account: Partial<Account> = {
-    username: 'john doe',
-    password: 'password',
-    apikey: 'secretkey',
-  };
 
   before('Setup application', async () => {
     ({app, client} = await setupApplication());
@@ -34,10 +25,10 @@ describe('Account-ApplicationController', () => {
     await clearDatabase(app);
   });
 
-  beforeEach('Get a valid JWT token', async () => {
-    await registerAnAccount(client, account);
-    token = await authenticateAnAccount(client, account);
-  });
+  // beforeEach('Get a valid JWT token', async () => {
+  //   await registerAnAccount(client, account);
+  //   token = await authenticateAnAccount(client, account);
+  // });
 
   after(async () => {
     await app.stop();
@@ -45,15 +36,17 @@ describe('Account-ApplicationController', () => {
 
   it('Get Applications belonging to an Account', async () => {
     // Arrange
+    const plainPassword = 'password';
+    const hashPassword = bcrypt.hashSync(plainPassword, 10);
     // Create Account
     const accountData = {
       username: 'john217',
-      password: 'password',
+      password: hashPassword,
       apikey: 'secretkey',
     };
     const accountData2 = {
       username: 'john219',
-      password: 'password',
+      password: hashPassword,
       apikey: 'secretkey',
     };
     await accountRepo.create(accountData);
@@ -79,19 +72,37 @@ describe('Account-ApplicationController', () => {
     };
     await applicationRepo.create(testApplication2);
 
+    // Login with account id 1
+    const res = await client
+      .post('/api/accounts/login')
+      .send({
+        username: accountData.username,
+        password: plainPassword,
+      })
+      .expect(200);
+    const token = res.body.token;
+    const accountId = res.body.userProfile.id;
+
     // Act
+    // Expect to get 401 when getting other account info
+    await client
+      .get('/api/accounts/2/applications')
+      .set('Authorization', 'Bearer ' + token)
+      .expect(401);
+
     const getApplicationByIdRes = await client
-      .get('/api/accounts/1/applications/')
+      .get(`/api/accounts/${accountId}/applications`)
       .set('Authorization', 'Bearer ' + token)
       .expect(200);
 
-    const getAllApplicationsFilteredRes = await client
-      .get('/api/applications/?filter[where][accountId]=1')
-      .set('Authorization', 'Bearer ' + token)
-      .expect(200);
+    const apps = await applicationRepo.find({
+      where: {
+        accountId,
+      },
+    });
 
     // Assert
-    expect(getApplicationByIdRes.body === getAllApplicationsFilteredRes.body);
+    expect(getApplicationByIdRes.body === apps);
   });
 
   it('Get Applications returns an error when JWT token is not provided', async () => {
