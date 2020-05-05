@@ -1,15 +1,15 @@
 import {Client, expect} from '@loopback/testlab';
 import {OtpGeneratorApplication} from '../..';
+import {Account} from '../../models';
 import {AccountRepository, ApplicationRepository} from '../../repositories';
 import {
-  setupApplication,
+  authenticateAnAccount,
   clearDatabase,
   registerAnAccount,
-  authenticateAnAccount,
   setupAccountRepository,
+  setupApplication,
   setupApplicationRepository,
 } from './test-helper';
-import {Account} from '../../models';
 
 describe('Account-ApplicationController', () => {
   let app: OtpGeneratorApplication;
@@ -45,7 +45,7 @@ describe('Account-ApplicationController', () => {
 
   it('Get Applications belonging to an Account', async () => {
     // Arrange
-    //Create Account
+    // Create Account
     const accountData = {
       username: 'john217',
       password: 'password',

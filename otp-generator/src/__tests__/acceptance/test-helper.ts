@@ -1,16 +1,15 @@
 import {
+  Client,
   createRestAppClient,
   givenHttpServerConfig,
-  Client,
 } from '@loopback/testlab';
-
 import {OtpGeneratorApplication} from '../..';
+import {Account} from '../../models';
 import {
   AccountRepository,
   ApplicationRepository,
   ApplicationuserRepository,
 } from '../../repositories';
-import {Account} from '../../models';
 
 export interface AppWithClient {
   app: OtpGeneratorApplication;
@@ -92,6 +91,7 @@ export async function registerAnAccount(
     username: account.username,
     password: account.password,
     apikey: account.apikey,
+    role: account.role,
   };
 
   const res = await client.post('/api/accounts/register').send(req);

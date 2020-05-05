@@ -43,8 +43,8 @@ export class BasicAuthorizer implements Provider<Authorizer> {
     if (currentUser.role === 'admin') return AuthorizationDecision.ALLOW;
 
     // Allow access if user role is allowed for that endpoint
-    if (metadata.allowedRoles!.includes(currentUser.role))
-      return AuthorizationDecision.ALLOW;
+    if (!metadata.allowedRoles!.includes(currentUser.role))
+      return AuthorizationDecision.DENY;
 
     // Check if models belong to current user
     // Because of our current api routes design, have to resort to this hacky authorisation solution
@@ -102,7 +102,7 @@ export class BasicAuthorizer implements Provider<Authorizer> {
     context: AuthorizationContext,
   ): boolean {
     // Compare account id from param with current user id
-    if (currentUser[securityId] === context.invocationContext.args[0])
+    if (Number(currentUser[securityId]) === context.invocationContext.args[0])
       return true;
 
     return false;
@@ -134,7 +134,7 @@ export class BasicAuthorizer implements Provider<Authorizer> {
     const req = _.find(context.invocationContext.args, o => o.accountId);
 
     // Compare account id from the request body with current user id
-    if (req.accountId === currentUser[securityId]) return true;
+    if (req.accountId === Number(currentUser[securityId])) return true;
 
     return false;
   }
