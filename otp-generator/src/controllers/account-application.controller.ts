@@ -15,6 +15,8 @@ export class AccountApplicationController {
   async findApplicationsByAccountId(
     @param.path.number('id') accountId: typeof Account.prototype.id,
   ): Promise<Application[]> {
-    return this.accountRepository.applications(accountId).find();
+    return this.accountRepository
+      .applications(accountId)
+      .find({include: [{relation: 'applicationusers'}]});
   }
 }

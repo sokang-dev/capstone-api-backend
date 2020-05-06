@@ -1,13 +1,12 @@
 import {Client, expect} from '@loopback/testlab';
-
 import {OtpGeneratorApplication} from '../..';
+import {Account} from '../../models';
 import {
-  setupApplication,
+  authenticateAnAccount,
   clearDatabase,
   registerAnAccount,
-  authenticateAnAccount,
+  setupApplication,
 } from './test-helper';
-import {Account} from '../../models';
 
 describe('ApplicationUserController tests', () => {
   let app: OtpGeneratorApplication;

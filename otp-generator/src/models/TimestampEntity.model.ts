@@ -5,7 +5,6 @@ export abstract class TimestampEntity extends Entity {
     type: 'date',
     default: () => new Date(),
     mysql: {
-      columnName: 'created_date',
       dataType: 'datetime',
       nullable: 'Y',
     },
@@ -16,7 +15,6 @@ export abstract class TimestampEntity extends Entity {
     type: 'date',
     default: () => new Date(),
     mysql: {
-      columnName: 'modified_date',
       dataType: 'datetime',
       nullable: 'Y',
     },

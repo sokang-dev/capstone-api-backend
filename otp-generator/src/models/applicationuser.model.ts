@@ -1,11 +1,21 @@
-import {model, property, belongsTo} from '@loopback/repository';
-import {TimestampEntity} from './TimestampEntity.model';
+/* eslint @typescript-eslint/camelcase: 0 */
+
+import {belongsTo, model, property} from '@loopback/repository';
 import {Application} from './application.model';
+import {TimestampEntity} from './TimestampEntity.model';
 
 @model({
   settings: {
     idInjection: false,
     mysql: {schema: 'otpgen', table: 'applicationuser'},
+    foreignKeys: {
+      fk_applicationuser_applicationId: {
+        name: 'fk_applicationuser_applicationId',
+        entity: 'Application',
+        entityKey: 'id',
+        foreignKey: 'applicationId',
+      },
+    },
   },
 })
 export class Applicationuser extends TimestampEntity {
@@ -15,8 +25,8 @@ export class Applicationuser extends TimestampEntity {
     precision: 10,
     scale: 0,
     id: true,
+    generated: true,
     mysql: {
-      columnName: 'id',
       dataType: 'int',
       dataLength: null,
       dataPrecision: 10,
@@ -26,14 +36,7 @@ export class Applicationuser extends TimestampEntity {
   })
   id: number;
 
-  @belongsTo(
-    () => Application,
-    {
-      keyFrom: 'Applicationuser.applicationId',
-      keyTo: 'Application.id',
-    },
-    {name: 'application_id'},
-  )
+  @belongsTo(() => Application)
   applicationId: number;
 
   @property({
@@ -41,7 +44,6 @@ export class Applicationuser extends TimestampEntity {
     required: true,
     length: 255,
     mysql: {
-      columnName: 'email',
       dataType: 'varchar',
       dataLength: 255,
       dataPrecision: null,
@@ -55,7 +57,6 @@ export class Applicationuser extends TimestampEntity {
     type: 'string',
     length: 255,
     mysql: {
-      columnName: 'username',
       dataType: 'varchar',
       dataLength: 255,
       dataPrecision: null,
@@ -70,7 +71,6 @@ export class Applicationuser extends TimestampEntity {
     required: true,
     length: 255,
     mysql: {
-      columnName: 'user_secret',
       dataType: 'varchar',
       dataLength: 255,
       dataPrecision: null,
@@ -85,7 +85,6 @@ export class Applicationuser extends TimestampEntity {
     required: true,
     length: 50,
     mysql: {
-      columnName: 'mobile_number',
       dataType: 'varchar',
       dataLength: 50,
       dataPrecision: null,
