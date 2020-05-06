@@ -21,7 +21,6 @@ describe('ApplicationUserController tests', () => {
 
   const appUserData = {
     email: 'johnsmith@gmail.com',
-    userSecret: 'rNONHRni6BAk7y2TiKrv',
     mobileNumber: '04162811',
     id: 1,
   };
@@ -44,7 +43,6 @@ describe('ApplicationUserController tests', () => {
     // Arrange
     const req = {
       email: appUserData.email,
-      userSecret: appUserData.userSecret,
       mobileNumber: appUserData.mobileNumber,
     };
 
@@ -57,16 +55,21 @@ describe('ApplicationUserController tests', () => {
 
     // Assert
     expect(res.body.email).to.equal('johnsmith@gmail.com');
-    expect(res.body.userSecret).to.equal('rNONHRni6BAk7y2TiKrv');
     expect(res.body.mobileNumber).to.equal('04162811');
+    expect(res.body.userSecret).not.empty();
   });
 
   it('Get app user by id returns an error when JWT token is not provided', async () => {
     // Arrange
-    const req = {...appUserData};
+    const req = {
+      email: appUserData.email,
+      mobileNumber: appUserData.mobileNumber,
+    };
 
     // Act
-    const res = await client.get('/api/applicationusers/' + req.id).send(req);
+    const res = await client
+      .get('/api/applicationusers/' + appUserData.id)
+      .send(req);
 
     // Assert
     expect(res.status).to.equal(401);
@@ -75,45 +78,69 @@ describe('ApplicationUserController tests', () => {
 
   it('Get app user by id', async () => {
     // Arrange
-    const req = {...appUserData};
+    const req = {
+      email: appUserData.email,
+      mobileNumber: appUserData.mobileNumber,
+    };
 
     // Act
     const res = await client
-      .get('/api/applicationusers/' + req.id)
+      .get('/api/applicationusers/' + appUserData.id)
       .set('Authorization', 'Bearer ' + token)
       .send(req)
       .expect(200);
 
     // Assert
     expect(res.body.email).to.equal('johnsmith@gmail.com');
-    expect(res.body.userSecret).to.equal('rNONHRni6BAk7y2TiKrv');
     expect(res.body.mobileNumber).to.equal('04162811');
+    expect(res.body.userSecret).not.empty();
   });
 
-  it('Partial update app user by id', async () => {
-    // Arrange
-    const req = {...appUserData};
+  it('Partial update of app user email by id', async () => {
+    //Arrange
+    const req = {
+      email: appUserData.email,
+      mobileNumber: appUserData.mobileNumber,
+    };
 
-    // Act /Assert
+    req.email = 'johnsmith23@gmail.com';
+
+    // Act
     await client
-      .patch('/api/applicationusers/' + req.id)
+      .patch('/api/applicationusers/' + appUserData.id)
       .set('Authorization', 'Bearer ' + token)
       .send(req)
       .expect(204);
+
+    const res = await client
+      .get('/api/applicationusers/' + appUserData.id)
+      .set('Authorization', 'Bearer ' + token)
+      .send(req)
+      .expect(200);
+
+    //Assert
+    expect(res.body.email).to.equal('johnsmith23@gmail.com');
   });
 
   it('Delete app user by id', async () => {
     // Arrange
-    const req = {...appUserData};
+    const req = {
+      email: appUserData.email,
+      mobileNumber: appUserData.mobileNumber,
+    };
 
     // Act
-    const res = await client
-      .delete('/api/applicationusers/' + req.id)
+    await client
+      .delete('/api/applicationusers/' + appUserData.id)
       .set('Authorization', 'Bearer ' + token)
       .send(req)
       .expect(204);
 
-    // Assert
-    expect(res.body).empty();
+    //Assert
+    await client
+      .get('/api/applicationusers/' + appUserData.id)
+      .set('Authorization', 'Bearer ' + token)
+      .send(req)
+      .expect(404);
   });
 });
