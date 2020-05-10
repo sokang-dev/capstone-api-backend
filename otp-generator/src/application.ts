@@ -15,8 +15,9 @@ import {
   JWTServiceConstants,
   JWTServiceBindings,
   AccountServiceBindings,
+  OTPServiceBindings,
 } from './keys';
-import {JwtService, AccountService} from './services';
+import {JwtService, AccountService, OtpService} from './services';
 import {JWTAuthenticationStrategy} from './jwt-strategy';
 
 export class OtpGeneratorApplication extends BootMixin(
@@ -72,5 +73,8 @@ export class OtpGeneratorApplication extends BootMixin(
 
     // Bind Account service
     this.bind(AccountServiceBindings.ACCOUNT_SERVICE).toClass(AccountService);
+
+    //Bind OTP service
+    this.bind(OTPServiceBindings.OTP_SERVICE).toClass(OtpService);
   }
 }
