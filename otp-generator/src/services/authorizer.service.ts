@@ -48,6 +48,7 @@ export class BasicAuthorizer implements Provider<Authorizer> {
 
     // Check if models belong to current user
     // Because of our current api routes design, have to resort to this hacky authorisation solution
+    console.log(context.invocationContext.targetClass.name);
     switch (context.invocationContext.targetClass.name) {
       case 'AccountController':
         if (this.checkAccountIdInParam(currentUser, context))
@@ -75,7 +76,7 @@ export class BasicAuthorizer implements Provider<Authorizer> {
           return AuthorizationDecision.ALLOW;
         break;
 
-      case 'ApplicationApplicationuserController':
+      case 'ApplicationApplicationUserController':
         if (await this.checkApplicationIdInParam(currentUser, context))
           return AuthorizationDecision.ALLOW;
         break;
@@ -134,12 +135,8 @@ export class BasicAuthorizer implements Provider<Authorizer> {
     // app is null if it's not owned by current user
     const app = await this.appRepo.findOne({
       where: {
-        and: [
-          {
-            id: appId,
-          },
-          {accountId: Number(currentUser[securityId])},
-        ],
+        id: appId,
+        accountId: Number(currentUser[securityId]),
       },
     });
 
