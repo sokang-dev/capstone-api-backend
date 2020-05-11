@@ -5,7 +5,6 @@ import speakeasy from 'speakeasy';
 import {Applicationuser} from '../models';
 import {ApplicationuserRepository} from '../repositories';
 
-
 @authenticate('jwt')
 export class GenerateOTPController {
   constructor(
@@ -31,7 +30,7 @@ export class GenerateOTPController {
     @param.path.number('id') id: typeof Applicationuser.prototype.id,
   ): Promise<string> {
     const applicationUser = await this.applicationuserRepository.findById(id);
-    if (applicationUser && applicationUser.userSecret) {
+    if (applicationUser?.userSecret) {
       const onetimepassword = speakeasy.totp({
         secret: applicationUser.userSecret,
         encoding: 'base32',
