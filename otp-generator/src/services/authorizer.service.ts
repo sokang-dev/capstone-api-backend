@@ -101,6 +101,9 @@ export class BasicAuthorizer implements Provider<Authorizer> {
     currentUser: UserProfile,
     context: AuthorizationContext,
   ): boolean {
+    // Exit when account id does not exist in parameter
+    if (context.invocationContext.args[0] instanceof Object) return false;
+
     // Compare account id from param with current user id
     if (Number(currentUser[securityId]) === context.invocationContext.args[0])
       return true;
@@ -115,6 +118,9 @@ export class BasicAuthorizer implements Provider<Authorizer> {
     // Get appId from param
     const appId = context.invocationContext.args[0];
 
+    // Exit when application id does not exist in parameter
+    if (appId instanceof Object) return false;
+
     // Check if app exists for that id
     // If it doesn't exists, return true to throw 404 error instead of 401 error
     const appExists = await this.appRepo.findOne({
@@ -128,8 +134,12 @@ export class BasicAuthorizer implements Provider<Authorizer> {
     // app is null if it's not owned by current user
     const app = await this.appRepo.findOne({
       where: {
-        id: appId,
-        accountId: Number(currentUser[securityId]),
+        and: [
+          {
+            id: appId,
+          },
+          {accountId: Number(currentUser[securityId])},
+        ],
       },
     });
 
@@ -177,6 +187,10 @@ export class BasicAuthorizer implements Provider<Authorizer> {
   ): Promise<boolean> {
     // Get appUserId from param
     const appUserId = context.invocationContext.args[0];
+
+    // Exit when appUserId does not exist in parameter
+    if (appUserId instanceof Object) return false;
+
     // Get appId from appUserId
     const appId = (await this.appUserRepo.findById(appUserId)).applicationId;
 
