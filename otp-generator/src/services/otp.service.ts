@@ -1,20 +1,20 @@
-import {Applicationuser, Application} from '../models';
 import speakeasy from 'speakeasy';
 
 export class OtpService {
   constructor() {}
 
   async verifyOTP(
-    appUser: Applicationuser,
+    userSecret: string,
     userOTP: string,
-    application: Partial<Application>,
+    otpLifetime: number,
+    otpLength: number,
   ): Promise<boolean> {
     const verifyOTP = speakeasy.totp.verify({
-      secret: appUser.userSecret,
+      secret: userSecret,
       encoding: 'base32',
       token: userOTP,
-      step: application.otpLifetime,
-      digits: application.otpLength,
+      step: otpLifetime,
+      digits: otpLength,
     });
     return verifyOTP;
   }
