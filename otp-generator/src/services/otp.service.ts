@@ -14,6 +14,7 @@ export class OtpService {
       encoding: 'base32',
       token: userOTP,
       step: application.otpLifetime,
+      digits: application.otpLength,
     });
     return verifyOTP;
   }
