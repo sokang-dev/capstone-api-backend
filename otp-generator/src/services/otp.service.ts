@@ -7,7 +7,7 @@ export class OtpService {
   async verifyOTP(
     appUser: Applicationuser,
     userOTP: string,
-    application: Application,
+    application: Partial<Application>,
   ): Promise<boolean> {
     const verifyOTP = speakeasy.totp.verify({
       secret: appUser.userSecret,
