@@ -10,8 +10,10 @@ import {
   post,
   requestBody,
 } from '@loopback/rest';
-import {Applicationuser} from '../models';
+import {Applicationuser, PartialApplicationuser} from '../models';
 import {ApplicationuserRepository} from '../repositories';
+
+import speakeasy from 'speakeasy';
 
 @authenticate('jwt')
 export class ApplicationuserController {
@@ -36,7 +38,7 @@ export class ApplicationuserController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Applicationuser, {
+          schema: getModelSchemaRef(PartialApplicationuser, {
             title: 'NewApplicationuser',
           }),
         },
@@ -44,6 +46,8 @@ export class ApplicationuserController {
     })
     applicationuser: Applicationuser,
   ): Promise<Applicationuser> {
+    const secret = speakeasy.generateSecret();
+    applicationuser.userSecret = secret.base32;
     return this.applicationuserRepository.create(applicationuser);
   }
 
