@@ -17,7 +17,7 @@ export class GenerateOTPController {
   @post('/otp/generate', {
     responses: {
       '204': {
-        description: 'Account DELETE success',
+        description: 'Generate and send OTP success',
       },
     },
   })
@@ -65,19 +65,20 @@ export class GenerateOTPController {
     }
 
     //call generateOTP function
-    const otp = await this.generateOTP(applicationUser!, application!);
+    const otp = this.generateOTP(applicationUser!, application!);
 
+    //call sendOTP function
     this.sendOTP(otp, applicationUser);
   }
 
   //function that generates OTP using speakeasy library
-  async generateOTP
+  generateOTP
     (appUser: Applicationuser, application: Application)
-    : Promise<string> {
+    : string {
     const onetimepassword = speakeasy.totp({
       secret: appUser.userSecret,
       encoding: 'base32',
-      length: application.otpLength,
+      digits: application.otpLength,
       step: application.otpLifetime
     });
     return onetimepassword;
@@ -94,7 +95,7 @@ export class GenerateOTPController {
     client.messages
       .create({
         body: 'One Time Password:' + userOTP,
-        from: '+12057937760',
+        from: process.env.TWILIO_PHONE_NUMBER,
         to: appUser.mobileNumber
       })
       .then((message: any) => console.log(message.sid));
