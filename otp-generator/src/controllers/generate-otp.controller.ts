@@ -1,9 +1,11 @@
 import {authenticate} from '@loopback/authentication';
+import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors, post, requestBody} from '@loopback/rest';
-import speakeasy from 'speakeasy';
-import {Application, Applicationuser} from '../models';
+import {OTPServiceBindings} from '../keys';
+import {Applicationuser} from '../models';
 import {ApplicationRepository, ApplicationuserRepository} from '../repositories';
+import {OtpService} from '../services';
 
 @authenticate('jwt')
 export class GenerateOTPController {
@@ -11,7 +13,9 @@ export class GenerateOTPController {
     @repository(ApplicationuserRepository)
     public applicationuserRepository: ApplicationuserRepository,
     @repository(ApplicationRepository)
-    public applicationRepository: ApplicationRepository
+    public applicationRepository: ApplicationRepository,
+    @inject(OTPServiceBindings.OTP_SERVICE)
+    public otpService: OtpService
   ) {}
 
   @post('/otp/generate', {
@@ -65,40 +69,10 @@ export class GenerateOTPController {
     }
 
     //call generateOTP function
-    const otp = this.generateOTP(applicationUser!, application!);
+    const otp = this.otpService.generateOTP(applicationUser!, application!);
 
     //call sendOTP function
-    this.sendOTP(otp, applicationUser);
-  }
-
-  //function that generates OTP using speakeasy library
-  generateOTP
-    (appUser: Applicationuser, application: Application)
-    : string {
-    const onetimepassword = speakeasy.totp({
-      secret: appUser.userSecret,
-      encoding: 'base32',
-      digits: application.otpLength,
-      step: application.otpLifetime
-    });
-    return onetimepassword;
-  }
-
-  //function that sends OTP to developer
-  async sendOTP(userOTP: string, appUser: Applicationuser)
-    : Promise<void> {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-
-    const client = require('twilio')(accountSid, authToken);
-
-    client.messages
-      .create({
-        body: 'One Time Password:' + userOTP,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: appUser.mobileNumber
-      })
-      .then((message: any) => console.log(message.sid));
+    this.otpService.sendOTP(otp, applicationUser);
   }
 
 }
