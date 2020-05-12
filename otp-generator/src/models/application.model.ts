@@ -55,10 +55,23 @@ export class Application extends TimestampEntity {
   accountId: number;
 
   @property({
+    type: 'string',
+    required: false,
+    length: 255,
+    mysql: {
+      dataType: 'varchar',
+      dataLength: 255,
+      nullable: 'Y',
+    },
+  })
+  applicationDescription?: string;
+
+  @property({
     type: 'number',
-    required: true,
+    required: false,
     precision: 10,
     scale: 0,
+    default: 6,
     mysql: {
       dataType: 'int',
       dataLength: null,
@@ -71,9 +84,10 @@ export class Application extends TimestampEntity {
 
   @property({
     type: 'number',
-    required: true,
+    required: false,
     precision: 10,
     scale: 0,
+    default: 60,
     mysql: {
       dataType: 'int',
       dataLength: null,
