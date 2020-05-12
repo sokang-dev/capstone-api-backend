@@ -51,7 +51,7 @@ export class GenerateOTPController {
     });
 
     if (!applicationUser) {
-      throw new HttpErrors.BadRequest('Application not found');
+      throw new HttpErrors.BadRequest('Application User not found');
     }
 
     const application = await this.applicationRepository.findOne({
