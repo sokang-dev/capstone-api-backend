@@ -1,43 +1,103 @@
 import {authenticate} from '@loopback/authentication';
 import {repository} from '@loopback/repository';
-import {get, getModelSchemaRef, param} from '@loopback/rest';
+import {HttpErrors, post, requestBody} from '@loopback/rest';
 import speakeasy from 'speakeasy';
-import {Applicationuser} from '../models';
-import {ApplicationuserRepository} from '../repositories';
-
+import {Application, Applicationuser} from '../models';
+import {ApplicationRepository, ApplicationuserRepository} from '../repositories';
 
 @authenticate('jwt')
 export class GenerateOTPController {
   constructor(
     @repository(ApplicationuserRepository)
     public applicationuserRepository: ApplicationuserRepository,
+    @repository(ApplicationRepository)
+    public applicationRepository: ApplicationRepository
   ) {}
 
-  @get('/onetimepassword/{id}', {
+  @post('/otp/generate', {
     responses: {
-      '200': {
-        description: 'Applicationuser model instance',
-        content: {
-          'application/json': {
-            schema: getModelSchemaRef(Applicationuser, {
-              includeRelations: true,
-            }),
-          },
-        },
+      '204': {
+        description: 'Account DELETE success',
       },
     },
   })
-  async findOneTimePasswordByUserId(
-    @param.path.number('id') id: typeof Applicationuser.prototype.id,
-  ): Promise<string> {
-    const applicationUser = await this.applicationuserRepository.findById(id);
-    if (applicationUser && applicationUser.userSecret) {
-      const onetimepassword = speakeasy.totp({
-        secret: applicationUser.userSecret,
-        encoding: 'base32',
-      });
-      return onetimepassword;
+  async create(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              applicationId:
+              {
+                type: 'number'
+              },
+              appUserEmail: {
+                type: 'string',
+              },
+            },
+          },
+        },
+      },
+    })
+    applicationuser: Partial<Applicationuser>,
+  ): Promise<void> {
+
+    const applicationUser = await this.applicationuserRepository.findOne({
+      where: {
+        email: applicationuser.appUserEmail,
+        applicationId: applicationuser.applicationId
+      },
+    });
+
+    if (!applicationUser) {
+      throw new HttpErrors.BadRequest('Application not found');
     }
-    return '';
+
+    const application = await this.applicationRepository.findOne({
+      where: {
+        id: applicationuser.applicationId
+      },
+    });
+
+    if (!application) {
+      throw new HttpErrors.BadRequest('Application not found');
+    }
+
+    //call generateOTP function
+    const otp = await this.generateOTP(applicationUser!, application!);
+
+    this.sendOTP(otp, applicationUser);
   }
+
+  //function that generates OTP using speakeasy library
+  async generateOTP
+    (appUser: Applicationuser, application: Application)
+    : Promise<string> {
+    const onetimepassword = speakeasy.totp({
+      secret: appUser.userSecret,
+      encoding: 'base32',
+      length: application.otpLength,
+      step: application.otpLifetime
+    });
+    return onetimepassword;
+  }
+
+  //function that sends OTP to developer
+  async sendOTP(userOTP: string, appUser: Applicationuser)
+    : Promise<void> {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+    const client = require('twilio')(accountSid, authToken);
+
+    client.messages
+      .create({
+        body: 'One Time Password:' + userOTP,
+        from: '+12057937760',
+        to: appUser.mobileNumber
+      })
+      .then((message: any) => console.log(message.sid));
+  }
+
 }
