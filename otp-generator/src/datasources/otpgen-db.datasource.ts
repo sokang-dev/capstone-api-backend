@@ -11,7 +11,6 @@ export class OtpgenDbDataSource extends juggler.DataSource {
   ) {
     // Override datesource config from environment variables
     Object.assign(dsConfig, {
-      url: process.env.DB_URL,
       host: process.env.DB_HOST,
       port: process.env.DB_PORT,
       user: process.env.DB_USER,

@@ -1,7 +1,6 @@
 {
   "name": "db",
   "connector": "mysql",
-  "url": "DB_URL",
   "host": "DB_HOST",
   "port": "DB_PORT",
   "user": "DB_USER",
