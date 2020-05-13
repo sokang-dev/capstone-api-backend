@@ -48,7 +48,6 @@ export class BasicAuthorizer implements Provider<Authorizer> {
 
     // Check if models belong to current user
     // Because of our current api routes design, have to resort to this hacky authorisation solution
-    console.log(context.invocationContext.targetClass.name);
     switch (context.invocationContext.targetClass.name) {
       case 'AccountController':
         if (this.checkAccountIdInParam(currentUser, context))
