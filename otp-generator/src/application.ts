@@ -1,23 +1,31 @@
+import {AuthenticationComponent} from '@loopback/authentication';
+import {
+  AuthorizationBindings,
+  AuthorizationComponent,
+  AuthorizationDecision,
+  AuthorizationOptions,
+  AuthorizationTags,
+} from '@loopback/authorization';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig, createBindingFromClass} from '@loopback/core';
+import {RepositoryMixin} from '@loopback/repository';
+import {RestApplication} from '@loopback/rest';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
-import {RepositoryMixin} from '@loopback/repository';
-import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
-import {AuthenticationComponent} from '@loopback/authentication';
-
-import {MySequence} from './sequence';
-import {
-  JWTServiceConstants,
-  JWTServiceBindings,
-  AccountServiceBindings,
-} from './keys';
-import {JwtService, AccountService} from './services';
 import {JWTAuthenticationStrategy} from './jwt-strategy';
+import {
+  AccountServiceBindings,
+  JWTServiceBindings,
+  JWTServiceConstants,
+  OTPServiceBindings,
+} from './keys';
+import {MySequence} from './sequence';
+import {AccountService, JwtService, OtpService} from './services';
+import {BasicAuthorizer} from './services/authorizer.service';
 
 export class OtpGeneratorApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -27,9 +35,8 @@ export class OtpGeneratorApplication extends BootMixin(
 
     this.setupBindings();
 
-    // Load authentication component
-    this.component(AuthenticationComponent);
-    this.add(createBindingFromClass(JWTAuthenticationStrategy));
+    // Setup Authentication and Authorization
+    this.setupAuth();
 
     // Set up the custom sequence
     this.sequence(MySequence);
@@ -72,5 +79,27 @@ export class OtpGeneratorApplication extends BootMixin(
 
     // Bind Account service
     this.bind(AccountServiceBindings.ACCOUNT_SERVICE).toClass(AccountService);
+
+    //Bind OTP service
+    this.bind(OTPServiceBindings.OTP_SERVICE).toClass(OtpService);
+  }
+
+  setupAuth(): void {
+    // Load authentication component
+    this.component(AuthenticationComponent);
+    this.add(createBindingFromClass(JWTAuthenticationStrategy));
+
+    // Load authorisation component
+    const authorizationOptions: AuthorizationOptions = {
+      // Default decision if all authorizers vote for ABSTAIN
+      defaultDecision: AuthorizationDecision.DENY,
+      // Deny vote will take precedence and override other votes
+      precedence: AuthorizationDecision.DENY,
+    };
+    this.configure(AuthorizationBindings.COMPONENT).to(authorizationOptions);
+    this.component(AuthorizationComponent);
+    this.bind('authorizationProviders.basic-authorizer')
+      .toProvider(BasicAuthorizer)
+      .tag(AuthorizationTags.AUTHORIZER);
   }
 }

@@ -47,6 +47,11 @@ export class ApplicationRepository extends DefaultCrudRepository<
       'applicationusers',
       applicationuserGetter,
     );
+
+    this.registerInclusionResolver(
+      'applicationusers',
+      this.applicationusers.inclusionResolver,
+    );
   }
 
   // Update modifiedDate property when model is about to be updated

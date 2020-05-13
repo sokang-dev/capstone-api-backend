@@ -1,9 +1,8 @@
 import {TokenService} from '@loopback/authentication';
 import {inject} from '@loopback/core';
-import {UserProfile, securityId} from '@loopback/security';
 import {HttpErrors} from '@loopback/rest';
+import {securityId, UserProfile} from '@loopback/security';
 import {promisify} from 'util';
-
 import {JWTServiceBindings} from '../keys';
 
 const jwt = require('jsonwebtoken');
@@ -23,9 +22,15 @@ export class JwtService implements TokenService {
       );
     }
 
+    const userInfoForToken = {
+      id: userProfile[securityId],
+      name: userProfile.name,
+      role: userProfile.role,
+    };
+
     let token: string;
     try {
-      token = await signAsync(userProfile, this.jwtSecret, {
+      token = await signAsync(userInfoForToken, this.jwtSecret, {
         expiresIn: Number(this.jwtLifespan),
       });
     } catch (err) {
@@ -52,6 +57,7 @@ export class JwtService implements TokenService {
           [securityId]: decodedToken.id,
           name: decodedToken.name,
           id: decodedToken.id,
+          role: decodedToken.role,
         },
       );
     } catch (err) {
