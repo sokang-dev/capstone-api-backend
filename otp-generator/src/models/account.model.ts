@@ -73,6 +73,19 @@ export class Account extends TimestampEntity {
   })
   apikey: string;
 
+  @property({
+    type: 'string',
+    required: false,
+    length: 50,
+    default: 'user',
+    mysql: {
+      dataType: 'varchar',
+      dataLength: 50,
+      nullable: 'N',
+    },
+  })
+  role: string;
+
   @hasMany(() => Application)
   applications?: Application[];
 

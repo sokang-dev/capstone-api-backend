@@ -1,20 +1,20 @@
+import {authenticate, UserService} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {inject} from '@loopback/core';
 import {Filter, FilterExcludingWhere, repository} from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
-  del,
+  post,
   requestBody,
 } from '@loopback/rest';
 import * as bcrypt from 'bcrypt';
-import {UserService, authenticate} from '@loopback/authentication';
-import {inject} from '@loopback/core';
-
-import {Account, Credentials, AccountDto} from '../models';
-import {AccountRepository} from '../repositories';
 import {AccountServiceBindings, JWTServiceBindings} from '../keys';
+import {Account, AccountDto, Credentials} from '../models';
+import {AccountRepository} from '../repositories';
 import {JwtService} from '../services';
 
 @authenticate('jwt')
@@ -133,13 +133,14 @@ export class AccountController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin']})
   async find(
     @param.filter(Account) filter?: Filter<Account>,
   ): Promise<Account[]> {
     return this.accountRepository.find(filter);
   }
 
-  // Get account by id
+  // Get an account by account id
   @get('/accounts/{id}', {
     responses: {
       '200': {
@@ -152,6 +153,7 @@ export class AccountController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin', 'user']})
   async findById(
     @param.path.number('id') id: number,
     @param.filter(Account, {exclude: 'where'})
@@ -160,7 +162,7 @@ export class AccountController {
     return this.accountRepository.findById(id, filter);
   }
 
-  // Partial update account by id
+  // Partial update an account by account id
   @patch('/accounts/{id}', {
     responses: {
       '204': {
@@ -168,6 +170,7 @@ export class AccountController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin', 'user']})
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -189,6 +192,7 @@ export class AccountController {
     await this.accountRepository.updateById(id, account);
   }
 
+  // Delete an account by account id
   @del('/accounts/{id}', {
     responses: {
       '204': {
@@ -196,6 +200,7 @@ export class AccountController {
       },
     },
   })
+  @authorize({allowedRoles: ['admin', 'user']})
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.accountRepository.deleteById(id);
   }

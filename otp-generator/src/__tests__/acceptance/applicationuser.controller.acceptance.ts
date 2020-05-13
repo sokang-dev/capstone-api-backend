@@ -1,15 +1,18 @@
 import {Client, expect} from '@loopback/testlab';
 import {OtpGeneratorApplication} from '../..';
-import {Account} from '../../models';
+import {Account, Application} from '../../models';
+import {ApplicationRepository} from '../../repositories';
 import {
   authenticateAnAccount,
   clearDatabase,
   registerAnAccount,
   setupApplication,
+  setupApplicationRepository,
 } from './test-helper';
 
 describe('ApplicationUserController tests', () => {
   let app: OtpGeneratorApplication;
+  let applicationRepo: ApplicationRepository;
   let client: Client;
   let token: string;
 
@@ -19,15 +22,23 @@ describe('ApplicationUserController tests', () => {
     apikey: 'secretkey',
   };
 
+  const appData: Partial<Application> = {
+    applicationName: 'test app',
+    accountId: 1,
+  };
+
   const appUserData = {
     email: 'johnsmith@gmail.com',
     mobileNumber: '04162811',
     id: 1,
+    applicationId: 1,
   };
 
   before('Setup application', async () => {
     ({app, client} = await setupApplication());
+    ({applicationRepo} = await setupApplicationRepository(app));
     await clearDatabase(app);
+    await createApp();
   });
 
   beforeEach('Get a valid JWT token', async () => {
@@ -44,6 +55,7 @@ describe('ApplicationUserController tests', () => {
     const req = {
       email: appUserData.email,
       mobileNumber: appUserData.mobileNumber,
+      applicationId: 1,
     };
 
     // Act
@@ -60,16 +72,8 @@ describe('ApplicationUserController tests', () => {
   });
 
   it('Get app user by id returns an error when JWT token is not provided', async () => {
-    // Arrange
-    const req = {
-      email: appUserData.email,
-      mobileNumber: appUserData.mobileNumber,
-    };
-
     // Act
-    const res = await client
-      .get('/api/applicationusers/' + appUserData.id)
-      .send(req);
+    const res = await client.get('/api/applicationusers/' + appUserData.id);
 
     // Assert
     expect(res.status).to.equal(401);
@@ -77,17 +81,10 @@ describe('ApplicationUserController tests', () => {
   });
 
   it('Get app user by id', async () => {
-    // Arrange
-    const req = {
-      email: appUserData.email,
-      mobileNumber: appUserData.mobileNumber,
-    };
-
     // Act
     const res = await client
       .get('/api/applicationusers/' + appUserData.id)
       .set('Authorization', 'Bearer ' + token)
-      .send(req)
       .expect(200);
 
     // Assert
@@ -143,4 +140,8 @@ describe('ApplicationUserController tests', () => {
       .send(req)
       .expect(404);
   });
+
+  async function createApp() {
+    await applicationRepo.create(appData);
+  }
 });
