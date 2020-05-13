@@ -21,9 +21,10 @@ import {
   AccountServiceBindings,
   JWTServiceBindings,
   JWTServiceConstants,
+  OTPServiceBindings,
 } from './keys';
 import {MySequence} from './sequence';
-import {AccountService, JwtService} from './services';
+import {AccountService, JwtService, OtpService} from './services';
 import {BasicAuthorizer} from './services/authorizer.service';
 
 export class OtpGeneratorApplication extends BootMixin(
@@ -78,6 +79,9 @@ export class OtpGeneratorApplication extends BootMixin(
 
     // Bind Account service
     this.bind(AccountServiceBindings.ACCOUNT_SERVICE).toClass(AccountService);
+
+    //Bind OTP service
+    this.bind(OTPServiceBindings.OTP_SERVICE).toClass(OtpService);
   }
 
   setupAuth(): void {
