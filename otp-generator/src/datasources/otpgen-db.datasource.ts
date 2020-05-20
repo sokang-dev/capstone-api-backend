@@ -9,7 +9,6 @@ export class OtpgenDbDataSource extends juggler.DataSource {
     @inject('datasources.config.db', {optional: true})
     dsConfig: object = config,
   ) {
-    console.log(dsConfig);
     // Override datesource config from environment variables
     Object.assign(dsConfig, {
       host: process.env.DB_HOST,
@@ -18,7 +17,6 @@ export class OtpgenDbDataSource extends juggler.DataSource {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
     });
-    console.log(dsConfig);
 
     super(dsConfig);
   }
