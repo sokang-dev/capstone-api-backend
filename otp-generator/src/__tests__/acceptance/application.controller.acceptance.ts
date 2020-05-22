@@ -1,13 +1,12 @@
 import {Client, expect} from '@loopback/testlab';
-
 import {OtpGeneratorApplication} from '../..';
+import {Account} from '../../models';
 import {
-  setupApplication,
+  authenticateAnAccount,
   clearDatabase,
   registerAnAccount,
-  authenticateAnAccount,
+  setupApplication,
 } from './test-helper';
-import {Account} from '../../models';
 
 describe('ApplicationController', () => {
   let app: OtpGeneratorApplication;
@@ -17,7 +16,6 @@ describe('ApplicationController', () => {
   const accountData: Partial<Account> = {
     username: 'john217',
     password: 'password',
-    apikey: 'secretkey',
   };
 
   const testApplication = {
@@ -29,15 +27,12 @@ describe('ApplicationController', () => {
 
   before('Setup application', async () => {
     ({app, client} = await setupApplication());
+    await registerAnAccount(client, accountData);
+    token = await authenticateAnAccount(client, accountData);
   });
 
   beforeEach('Clear database', async () => {
     await clearDatabase(app);
-  });
-
-  beforeEach('Get a valid JWT token', async () => {
-    await registerAnAccount(client, accountData);
-    token = await authenticateAnAccount(client, accountData);
   });
 
   after(async () => {
@@ -138,7 +133,7 @@ describe('ApplicationController', () => {
       .expect(404);
   });
 
-  it('Get all Applications', async () => {
+  it('Get all Applications returns 401 error as a user', async () => {
     // Arrange
     const req = {...testApplication};
 
@@ -153,6 +148,36 @@ describe('ApplicationController', () => {
     await client
       .get('/api/applications')
       .set('Authorization', 'Bearer ' + token)
+      .expect(401);
+  });
+
+  it('Get all Applications returns applications as an admin', async () => {
+    // Arrange
+    const req = {...testApplication};
+    // Register admin account
+    await client.post('/api/accounts/register').send({
+      username: 'admin',
+      password: 'password',
+      role: 'admin',
+    });
+    // Login as admin
+    const res = await client.post('/api/accounts/login').send({
+      username: 'admin',
+      password: 'password',
+    });
+    const adminToken = res.body.token;
+
+    // Act
+    await client
+      .post('/api/applications')
+      .send(req)
+      .set('Authorization', 'Bearer ' + adminToken)
+      .expect(200);
+
+    // Assert
+    await client
+      .get('/api/applications')
+      .set('Authorization', 'Bearer ' + adminToken)
       .expect(200);
   });
 });

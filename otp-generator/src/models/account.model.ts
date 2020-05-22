@@ -61,17 +61,15 @@ export class Account extends TimestampEntity {
   @property({
     type: 'string',
     required: false,
-    length: 255,
-    default: 'someapikey',
+    length: 50,
+    default: 'user',
     mysql: {
       dataType: 'varchar',
-      dataLength: 255,
-      dataPrecision: null,
-      dataScale: null,
+      dataLength: 50,
       nullable: 'N',
     },
   })
-  apikey: string;
+  role: string;
 
   @hasMany(() => Application)
   applications?: Application[];
@@ -86,10 +84,7 @@ export type Credentials = {
   password: string;
 };
 
-export type AccountDto = Omit<
-  Account,
-  'id' | 'apikey' | 'createdDate' | 'modifiedDate'
->;
+export type AccountDto = Omit<Account, 'id' | 'createdDate' | 'modifiedDate'>;
 
 export interface AccountRelations {
   applications: ApplicationWithRelations[];

@@ -1,10 +1,9 @@
 import {UserService} from '@loopback/authentication';
-import * as bcrypt from 'bcrypt';
-import {HttpErrors} from '@loopback/rest';
-import {UserProfile, securityId} from '@loopback/security';
-
-import {Account, Credentials} from '../models/account.model';
 import {repository} from '@loopback/repository';
+import {HttpErrors} from '@loopback/rest';
+import {securityId, UserProfile} from '@loopback/security';
+import * as bcrypt from 'bcrypt';
+import {Account, Credentials} from '../models/account.model';
 import {AccountRepository} from '../repositories';
 
 export class AccountService implements UserService<Account, Credentials> {
@@ -35,6 +34,7 @@ export class AccountService implements UserService<Account, Credentials> {
       [securityId]: account.id.toString(),
       id: account.id,
       name: account.username,
+      role: account.role,
     };
   }
 }

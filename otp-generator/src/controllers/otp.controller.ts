@@ -84,8 +84,20 @@ export class GenerateOTPController {
 
   @post('/otp/verify', {
     responses: {
-      '204': {
-        description: 'Verify OTP success',
+      '200': {
+        description: 'Verify OTP validity',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                isOtpValid: {
+                  type: 'boolean',
+                },
+              },
+            },
+          },
+        },
       },
     },
   })
@@ -96,8 +108,11 @@ export class GenerateOTPController {
           schema: {
             type: 'object',
             properties: {
-              appUserId: {
+              applicationId: {
                 type: 'number',
+              },
+              appUserEmail: {
+                type: 'string',
               },
               userOTP: {
                 type: 'string',
@@ -107,12 +122,13 @@ export class GenerateOTPController {
         },
       },
     })
-    applicationuser: Partial<Applicationuser>,
+    verifyOtpRequest: VerifyOtpRequest,
   ): Promise<boolean> {
     //Retrieve application user
     const applicationUser = await this.applicationuserRepository.findOne({
       where: {
-        id: applicationuser.appUserId,
+        email: verifyOtpRequest.appUserEmail,
+        applicationId: verifyOtpRequest.applicationId,
       },
     });
 
@@ -123,7 +139,7 @@ export class GenerateOTPController {
     //Retrieve application for the application user
     const application = await this.applicationRepository.findOne({
       where: {
-        id: applicationUser.applicationId,
+        id: verifyOtpRequest.applicationId,
       },
     });
 
@@ -134,9 +150,15 @@ export class GenerateOTPController {
     //Verify the application user's OTP
     return this.otpService.verifyOTP(
       applicationUser.userSecret,
-      applicationuser.userOTP,
+      verifyOtpRequest.userOTP,
       application.otpLifetime,
       application.otpLength,
     );
   }
 }
+
+export type VerifyOtpRequest = {
+  applicationId: number;
+  appUserEmail: string;
+  userOTP: string;
+};

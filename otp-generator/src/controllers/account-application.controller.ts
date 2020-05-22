@@ -1,10 +1,12 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {repository} from '@loopback/repository';
 import {get, param} from '@loopback/rest';
 import {Account, Application} from '../models';
 import {AccountRepository} from '../repositories';
-import {authenticate} from '@loopback/authentication';
 
 @authenticate('jwt')
+@authorize({allowedRoles: ['admin', 'user']})
 export class AccountApplicationController {
   constructor(
     @repository(AccountRepository)
