@@ -79,9 +79,20 @@ export class GenerateOTPController {
   @post('/otp/verify', {
     responses: {
       '200': {
-        description: 'Verify OTP success',
+        description: 'Verify OTP validity',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                isOtpValid: {
+                  type: 'boolean',
+                },
+              },
+            },
+          },
+        },
       },
-      "success": true
     },
   })
   async createVerify(
@@ -91,9 +102,8 @@ export class GenerateOTPController {
           schema: {
             type: 'object',
             properties: {
-              applicationId:
-              {
-                type: 'number'
+              applicationId: {
+                type: 'number',
               },
               appUserEmail: {
                 type: 'string',
@@ -108,12 +118,11 @@ export class GenerateOTPController {
     })
     verifyOtpRequest: VerifyOtpRequest,
   ): Promise<boolean> {
-
-     //Retrieve application user
+    //Retrieve application user
     const applicationUser = await this.applicationuserRepository.findOne({
       where: {
         email: verifyOtpRequest.appUserEmail,
-        applicationId: verifyOtpRequest.applicationId
+        applicationId: verifyOtpRequest.applicationId,
       },
     });
 
@@ -124,7 +133,7 @@ export class GenerateOTPController {
     //Retrieve application for the application user
     const application = await this.applicationRepository.findOne({
       where: {
-        id: verifyOtpRequest.applicationId
+        id: verifyOtpRequest.applicationId,
       },
     });
 
@@ -133,13 +142,17 @@ export class GenerateOTPController {
     }
 
     //Verify the application user's OTP
-    return this.otpService.verifyOTP(applicationUser.userSecret, verifyOtpRequest.userOTP, 
-      application.otpLifetime, application.otpLength);
+    return this.otpService.verifyOTP(
+      applicationUser.userSecret,
+      verifyOtpRequest.userOTP,
+      application.otpLifetime,
+      application.otpLength,
+    );
   }
 }
 
 export type VerifyOtpRequest = {
   applicationId: number;
   appUserEmail: string;
-  userOTP : string;
+  userOTP: string;
 };
