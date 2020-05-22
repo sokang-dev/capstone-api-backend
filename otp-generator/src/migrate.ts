@@ -1,6 +1,9 @@
+import dotenv from 'dotenv';
 import {OtpGeneratorApplication} from './application';
 
 export async function migrate(args: string[]) {
+  dotenv.config();
+
   const existingSchema = args.includes('--rebuild') ? 'drop' : 'alter';
   console.log('Migrating schemas (%s existing schema)', existingSchema);
 
