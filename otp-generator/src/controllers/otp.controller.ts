@@ -48,6 +48,7 @@ export class GenerateOTPController {
     })
     applicationuser: Partial<Applicationuser>,
   ): Promise<void> {
+    //Retrieve application user
     const applicationUser = await this.applicationuserRepository.findOne({
       where: {
         email: applicationuser.appUserEmail,
@@ -59,6 +60,7 @@ export class GenerateOTPController {
       throw new HttpErrors.BadRequest('Application User not found');
     }
 
+    //Retrieve application for the application user
     const application = await this.applicationRepository.findOne({
       where: {
         id: applicationuser.applicationId,
@@ -70,10 +72,14 @@ export class GenerateOTPController {
     }
 
     //call generateOTP function
-    const otp = this.otpService.generateOTP(applicationUser!, application!);
+    const otp = this.otpService.generateOTP(
+      applicationUser.userSecret,
+      application.otpLength,
+      application.otpLifetime,
+    );
 
     //call sendOTP function
-    await this.otpService.sendOTP(otp, applicationUser);
+    await this.otpService.sendOTP(otp, applicationUser.mobileNumber);
   }
 
   @post('/otp/verify', {
@@ -90,9 +96,8 @@ export class GenerateOTPController {
           schema: {
             type: 'object',
             properties: {
-              appUserId:
-              {
-                type: 'number'
+              appUserId: {
+                type: 'number',
               },
               userOTP: {
                 type: 'string',
@@ -104,14 +109,13 @@ export class GenerateOTPController {
     })
     applicationuser: Partial<Applicationuser>,
   ): Promise<boolean> {
-
     //Retrieve application user
     const applicationUser = await this.applicationuserRepository.findOne({
       where: {
-        id: applicationuser.appUserId
+        id: applicationuser.appUserId,
       },
     });
-  
+
     if (!applicationUser) {
       throw new HttpErrors.BadRequest('Application User not found');
     }
@@ -119,16 +123,20 @@ export class GenerateOTPController {
     //Retrieve application for the application user
     const application = await this.applicationRepository.findOne({
       where: {
-        id: applicationUser.applicationId
+        id: applicationUser.applicationId,
       },
     });
 
     if (!application) {
       throw new HttpErrors.BadRequest('Application not found');
     }
-    
+
     //Verify the application user's OTP
-    return this.otpService.verifyOTP(applicationUser.userSecret, applicationuser.userOTP, 
-      application.otpLifetime, application.otpLength);
+    return this.otpService.verifyOTP(
+      applicationUser.userSecret,
+      applicationuser.userOTP,
+      application.otpLifetime,
+      application.otpLength,
+    );
   }
 }

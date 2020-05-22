@@ -1,36 +1,35 @@
 import speakeasy from 'speakeasy';
-import {Application, Applicationuser} from '../models';
 
 export class OtpService {
   constructor() {}
 
   //function that generates OTP using speakeasy library
-  generateOTP
-    (appUser: Applicationuser, application: Application)
-    : string {
+  generateOTP(
+    userSecret: string,
+    otpLength: number,
+    otpLifetime: number,
+  ): string {
     const onetimepassword = speakeasy.totp({
-      secret: appUser.userSecret,
+      secret: userSecret,
       encoding: 'base32',
-      digits: application.otpLength,
-      step: application.otpLifetime
+      digits: otpLength,
+      step: otpLifetime,
     });
     return onetimepassword;
   }
 
   //function that sends OTP to developer
-  async sendOTP(userOTP: string, appUser: Applicationuser)
-    : Promise<void> {
+  async sendOTP(userOTP: string, mobileNumber: string): Promise<void> {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
 
     const client = require('twilio')(accountSid, authToken);
 
-    await client.messages
-      .create({
-        body: 'One Time Password: ' + userOTP,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: appUser.mobileNumber
-      })
+    await client.messages.create({
+      body: 'One Time Password: ' + userOTP,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: mobileNumber,
+    });
   }
 
   async verifyOTP(
