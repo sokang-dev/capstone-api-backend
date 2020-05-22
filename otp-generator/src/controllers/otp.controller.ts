@@ -4,14 +4,11 @@ import {repository} from '@loopback/repository';
 import {HttpErrors, post, requestBody} from '@loopback/rest';
 import {OTPServiceBindings} from '../keys';
 import {Applicationuser} from '../models';
-import {
-  ApplicationRepository,
-  ApplicationuserRepository,
-} from '../repositories';
+import {ApplicationRepository, ApplicationuserRepository} from '../repositories';
 import {OtpService} from '../services';
 
 @authenticate('jwt')
-export class GenerateOTPController {
+export class OTPController {
   constructor(
     @repository(ApplicationuserRepository)
     public applicationuserRepository: ApplicationuserRepository,
