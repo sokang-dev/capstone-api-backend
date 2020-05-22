@@ -23,7 +23,6 @@ export class AccountRepository extends DefaultCrudRepository<
     @repository.getter('ApplicationRepository')
     applicationRepositoryGetter: Getter<ApplicationRepository>,
   ) {
-    console.log(dataSource.settings);
     super(Account, dataSource);
     this.applications = this.createHasManyRepositoryFactoryFor(
       'applications',
