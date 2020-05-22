@@ -42,12 +42,10 @@ describe('Account-ApplicationController', () => {
     const accountData = {
       username: 'john217',
       password: hashPassword,
-      apikey: 'secretkey',
     };
     const accountData2 = {
       username: 'john219',
       password: hashPassword,
-      apikey: 'secretkey',
     };
     await accountRepo.create(accountData);
     //Create a second account
