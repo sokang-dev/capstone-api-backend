@@ -19,7 +19,6 @@ describe('ApplicationUserController tests', () => {
   const accountData: Partial<Account> = {
     username: 'john217',
     password: 'password',
-    apikey: 'secretkey',
   };
 
   const appData: Partial<Application> = {

@@ -16,7 +16,6 @@ describe('ApplicationController', () => {
   const accountData: Partial<Account> = {
     username: 'john217',
     password: 'password',
-    apikey: 'secretkey',
   };
 
   const testApplication = {
@@ -159,7 +158,6 @@ describe('ApplicationController', () => {
     await client.post('/api/accounts/register').send({
       username: 'admin',
       password: 'password',
-      apikey: 'secret',
       role: 'admin',
     });
     // Login as admin

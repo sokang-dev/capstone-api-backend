@@ -14,19 +14,16 @@ describe('AccountController', () => {
   const accountData = {
     username: 'john217',
     password: 'password',
-    apikey: 'secretkey',
   };
 
   const accountData2 = {
     username: 'jane777',
     password: 'qweas',
-    apikey: 'secretkey',
   };
 
   const adminAccountData = {
     username: 'admin',
     password: 'p4$$w0rd',
-    apikey: 'secretkey',
     role: 'admin',
   };
 
@@ -54,7 +51,6 @@ describe('AccountController', () => {
     const req = {
       username: 'john200',
       password: 'wqeasd',
-      apikey: 'secret',
     };
 
     // Act
