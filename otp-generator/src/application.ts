@@ -15,6 +15,7 @@ import {
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
+import dotenv from 'dotenv';
 import path from 'path';
 import {JWTAuthenticationStrategy} from './jwt-strategy';
 import {
@@ -32,6 +33,7 @@ export class OtpGeneratorApplication extends BootMixin(
 ) {
   constructor(options: ApplicationConfig = {}) {
     super(options);
+    dotenv.config();
 
     this.setupBindings();
 
