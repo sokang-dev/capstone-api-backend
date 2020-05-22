@@ -25,13 +25,12 @@ export class OtpService {
 
     const client = require('twilio')(accountSid, authToken);
 
-    client.messages
+    await client.messages
       .create({
-        body: 'One Time Password:' + userOTP,
+        body: 'One Time Password: ' + userOTP,
         from: process.env.TWILIO_PHONE_NUMBER,
         to: appUser.mobileNumber
       })
-      .then((message: any) => console.log(message.sid));
   }
 
   async verifyOTP(
