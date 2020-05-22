@@ -4,7 +4,10 @@ import {repository} from '@loopback/repository';
 import {HttpErrors, post, requestBody} from '@loopback/rest';
 import {OTPServiceBindings} from '../keys';
 import {Applicationuser} from '../models';
-import {ApplicationRepository, ApplicationuserRepository} from '../repositories';
+import {
+  ApplicationRepository,
+  ApplicationuserRepository,
+} from '../repositories';
 import {OtpService} from '../services';
 
 @authenticate('jwt')
@@ -15,7 +18,7 @@ export class GenerateOTPController {
     @repository(ApplicationRepository)
     public applicationRepository: ApplicationRepository,
     @inject(OTPServiceBindings.OTP_SERVICE)
-    public otpService: OtpService
+    public otpService: OtpService,
   ) {}
 
   @post('/otp/generate', {
@@ -32,9 +35,8 @@ export class GenerateOTPController {
           schema: {
             type: 'object',
             properties: {
-              applicationId:
-              {
-                type: 'number'
+              applicationId: {
+                type: 'number',
               },
               appUserEmail: {
                 type: 'string',
@@ -46,11 +48,10 @@ export class GenerateOTPController {
     })
     applicationuser: Partial<Applicationuser>,
   ): Promise<void> {
-
     const applicationUser = await this.applicationuserRepository.findOne({
       where: {
         email: applicationuser.appUserEmail,
-        applicationId: applicationuser.applicationId
+        applicationId: applicationuser.applicationId,
       },
     });
 
@@ -60,7 +61,7 @@ export class GenerateOTPController {
 
     const application = await this.applicationRepository.findOne({
       where: {
-        id: applicationuser.applicationId
+        id: applicationuser.applicationId,
       },
     });
 
@@ -72,7 +73,7 @@ export class GenerateOTPController {
     const otp = this.otpService.generateOTP(applicationUser!, application!);
 
     //call sendOTP function
-    this.otpService.sendOTP(otp, applicationUser);
+    await this.otpService.sendOTP(otp, applicationUser);
   }
 
   @post('/otp/verify', {
