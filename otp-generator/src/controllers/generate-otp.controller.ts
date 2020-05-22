@@ -75,4 +75,59 @@ export class GenerateOTPController {
     this.otpService.sendOTP(otp, applicationUser);
   }
 
+  @post('/otp/verify', {
+    responses: {
+      '204': {
+        description: 'Verify OTP success',
+      },
+    },
+  })
+  async createVerify(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              appUserId:
+              {
+                type: 'number'
+              },
+              userOTP: {
+                type: 'string',
+              },
+            },
+          },
+        },
+      },
+    })
+    applicationuser: Partial<Applicationuser>,
+  ): Promise<boolean> {
+
+    //Retrieve application user
+    const applicationUser = await this.applicationuserRepository.findOne({
+      where: {
+        id: applicationuser.appUserId
+      },
+    });
+  
+    if (!applicationUser) {
+      throw new HttpErrors.BadRequest('Application User not found');
+    }
+
+    //Retrieve application for the application user
+    const application = await this.applicationRepository.findOne({
+      where: {
+        id: applicationUser.applicationId
+      },
+    });
+
+    if (!application) {
+      throw new HttpErrors.BadRequest('Application not found');
+    }
+    
+    //Verify the application user's OTP
+    return this.otpService.verifyOTP(applicationUser.userSecret, applicationuser.userOTP, 
+      application.otpLifetime, application.otpLength);
+  }
 }
