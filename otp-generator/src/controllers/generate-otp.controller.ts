@@ -77,9 +77,10 @@ export class GenerateOTPController {
 
   @post('/otp/verify', {
     responses: {
-      '204': {
+      '200': {
         description: 'Verify OTP success',
       },
+      "success": true
     },
   })
   async createVerify(
@@ -89,9 +90,12 @@ export class GenerateOTPController {
           schema: {
             type: 'object',
             properties: {
-              appUserId:
+              applicationId:
               {
                 type: 'number'
+              },
+              appUserEmail: {
+                type: 'string',
               },
               userOTP: {
                 type: 'string',
@@ -101,16 +105,17 @@ export class GenerateOTPController {
         },
       },
     })
-    applicationuser: Partial<Applicationuser>,
+    verifyOtpRequest: VerifyOtpRequest,
   ): Promise<boolean> {
 
-    //Retrieve application user
+     //Retrieve application user
     const applicationUser = await this.applicationuserRepository.findOne({
       where: {
-        id: applicationuser.appUserId
+        email: verifyOtpRequest.appUserEmail,
+        applicationId: verifyOtpRequest.applicationId
       },
     });
-  
+
     if (!applicationUser) {
       throw new HttpErrors.BadRequest('Application User not found');
     }
@@ -118,16 +123,22 @@ export class GenerateOTPController {
     //Retrieve application for the application user
     const application = await this.applicationRepository.findOne({
       where: {
-        id: applicationUser.applicationId
+        id: verifyOtpRequest.applicationId
       },
     });
 
     if (!application) {
       throw new HttpErrors.BadRequest('Application not found');
     }
-    
+
     //Verify the application user's OTP
-    return this.otpService.verifyOTP(applicationUser.userSecret, applicationuser.userOTP, 
+    return this.otpService.verifyOTP(applicationUser.userSecret, verifyOtpRequest.userOTP, 
       application.otpLifetime, application.otpLength);
   }
 }
+
+export type VerifyOtpRequest = {
+  applicationId: number;
+  appUserEmail: string;
+  userOTP : string;
+};
