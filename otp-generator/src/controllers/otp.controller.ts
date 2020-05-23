@@ -11,7 +11,7 @@ import {
 import {OtpService} from '../services';
 
 @authenticate('jwt')
-export class GenerateOTPController {
+export class OTPController {
   constructor(
     @repository(ApplicationuserRepository)
     public applicationuserRepository: ApplicationuserRepository,
@@ -48,6 +48,7 @@ export class GenerateOTPController {
     })
     applicationuser: Partial<Applicationuser>,
   ): Promise<void> {
+    //Retrieve application user
     const applicationUser = await this.applicationuserRepository.findOne({
       where: {
         email: applicationuser.appUserEmail,
@@ -59,6 +60,7 @@ export class GenerateOTPController {
       throw new HttpErrors.BadRequest('Application User not found');
     }
 
+    //Retrieve application for the application user
     const application = await this.applicationRepository.findOne({
       where: {
         id: applicationuser.applicationId,
@@ -70,10 +72,14 @@ export class GenerateOTPController {
     }
 
     //call generateOTP function
-    const otp = this.otpService.generateOTP(applicationUser!, application!);
+    const otp = this.otpService.generateOTP(
+      applicationUser.userSecret,
+      application.otpLength,
+      application.otpLifetime,
+    );
 
     //call sendOTP function
-    await this.otpService.sendOTP(otp, applicationUser);
+    await this.otpService.sendOTP(otp, applicationUser.mobileNumber);
   }
 
   @post('/otp/verify', {
