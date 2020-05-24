@@ -1,13 +1,9 @@
-const dotenv = require('dotenv');
-
+require('dotenv').config();
 const application = require('./dist');
 
 module.exports = application;
 
 if (require.main === module) {
-  // Load up environment variables
-  dotenv.config();
-
   // Run the application
   const config = {
     rest: {

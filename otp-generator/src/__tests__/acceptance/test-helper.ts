@@ -90,7 +90,6 @@ export async function registerAnAccount(
   const req = {
     username: account.username,
     password: account.password,
-    apikey: account.apikey,
     role: account.role,
   };
 

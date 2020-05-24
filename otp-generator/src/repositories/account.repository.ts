@@ -1,11 +1,11 @@
+import {Getter, inject} from '@loopback/core';
 import {
   DefaultCrudRepository,
   HasManyRepositoryFactory,
-  repository,
   juggler,
+  repository,
 } from '@loopback/repository';
 import {Account, AccountRelations, Application} from '../models';
-import {inject, Getter} from '@loopback/core';
 import {ApplicationRepository} from './application.repository';
 
 export class AccountRepository extends DefaultCrudRepository<
