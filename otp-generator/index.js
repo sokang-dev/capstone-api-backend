@@ -20,11 +20,9 @@ if (require.main === module) {
         // useful when used with OpenAPI-to-GraphQL to locate your application
         setServersFromRequest: true,
       },
-      rest: {
-        protocol: 'https',
-        key: fs.readFileSync('./privatekey.pem'),
-        cert: fs.readFileSync('./certificate.pem'),
-      },
+      protocol: 'https',
+      key: fs.readFileSync('./privatekey.pem'),
+      cert: fs.readFileSync('./certificate.pem'),
     },
   };
   application.main(config).catch(err => {
