@@ -1,3 +1,4 @@
+const fs = require('fs');
 require('dotenv').config();
 const application = require('./dist');
 
@@ -19,6 +20,9 @@ if (require.main === module) {
         // useful when used with OpenAPI-to-GraphQL to locate your application
         setServersFromRequest: true,
       },
+      protocol: 'https',
+      key: fs.readFileSync('./key.pem'),
+      cert: fs.readFileSync('./cert.pem'),
     },
   };
   application.main(config).catch(err => {
