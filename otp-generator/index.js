@@ -21,8 +21,8 @@ if (require.main === module) {
         setServersFromRequest: true,
       },
       protocol: 'https',
-      key: fs.readFileSync('./privatekey.pem'),
-      cert: fs.readFileSync('./certificate.pem'),
+      key: fs.readFileSync('./key.pem'),
+      cert: fs.readFileSync('./cert.pem'),
     },
   };
   application.main(config).catch(err => {
