@@ -1,0 +1,146 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "RMIT Stand-alone ec2 instance"
+Parameters:
+  ami: 
+    Type: String
+    Default: 'ami-0aaceffb9f9a60857'
+  appname:
+    Type: String
+    Default: 'RMIT_app'
+  availabilityzone:
+    Type: 'AWS::EC2::AvailabilityZone::Name'
+    Description: 'AZ for this instance'
+    Default: 'ap-southeast-2a'
+  costcenter:
+    Type: String
+    Default: 'RMIT_Harris'
+  commonsecgroup:
+    Type: String
+    Description: 'Common security group for all instances'
+    Default: 'sg-03dcb92418ac24cf4'
+  power:
+    Type: String
+    Default: 'MBH'
+  environment: 
+    Type: String
+    Default: 'Dev'
+  version: 
+    Type: String
+    Default: '1.0.0'
+  iaminstanceprofile:
+    Type: String
+    Default: 'AmazonEC2FullAccess'
+  instancetype: 
+    Type: String
+    Default: 't2.micro'
+  ingresssecgroupid: 
+    Type: String
+    Default: ''
+  ingresscidr:
+    Type: String
+    Default: '0.0.0.0/0'
+  vpc:
+    Type: String
+    Default: 'vpc-498cd32e'
+  subnet: 
+    Type: String
+    Default: 'subnet-bd3202f4'
+  keyname:
+    Type: String
+    Description: 'Available in ssm param store'
+    Default: 'otpgen'
+
+Resources:
+  STANDALONEBOX:
+    Type: AWS::EC2::Instance
+    Properties: 
+      AvailabilityZone: !Ref availabilityzone
+      DisableApiTermination: 'false'
+      EbsOptimized: 'false'
+      IamInstanceProfile: !Ref iaminstanceprofile
+      ImageId: !Ref ami
+      InstanceInitiatedShutdownBehavior: terminate
+      InstanceType: !Ref instancetype
+      KeyName: !Ref keyname
+      Monitoring: 'false'
+      NetworkInterfaces: 
+        # - NetworkInterface: 'eni-02afc91b8bc352f05'
+        - AssociatePublicIpAddress: true
+          DeleteOnTermination: true
+          DeviceIndex: '0'
+          GroupSet: 
+            - Ref: SG
+          SubnetId: !Ref subnet
+      Tags: 
+        - Key: 'ApplicationName'
+          Value: !Ref appname
+        - Key: 'CostCenter'
+          Value: !Ref costcenter
+        - Key: 'PowerManagerment'
+          Value: !Ref power
+        - Key: 'Environment'
+          Value: !Ref environment
+        - Key: 'InstanceType'
+          Value: !Ref instancetype
+        - Key: 'KeyName'
+          Value: !Ref keyname
+      Tenancy: default
+      UserData: 
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash -xe
+            echo 'Instance is running.' > ./checkpoints.txt
+            exit 0
+      # Volumes: 
+      #   - VolumeID: !Ref NewVolume
+      #     Device: '/dev/xvda'
+    DependsOn: SG
+    # DependsOn: NewVolume
+  # NewVolume:
+  #   Type: 'AWS::EC2::Volume'
+  #   Properties: 
+  #     Encrypted: true
+  #     size: 8
+  #     AvailabilityZone: !Ref availabilityzone
+  # MountPoint:
+  #   Type: 'AWS::EC2::VolumeAttachment'
+  #   Properties:
+  #     Device: '/dev/xvda'
+  #     InstanceId: !Ref STANDALONEBOX
+  #     VolumeId: !Ref NewVolume
+  SG:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties: 
+      GroupDescription: 'Enable SSH http https'
+      VpcId: !Ref vpc
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Ref ingresscidr
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: !Ref ingresscidr
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref ingresscidr
+      GroupName: !Ref appname
+      Tags: 
+        - Key: 'ApplicationName'
+          Value: !Ref appname
+        - Key: 'CostCenter'
+          Value: !Ref costcenter
+        - Key: 'PowerManagerment'
+          Value: !Ref power
+        - Key: 'Environment'
+          Value: !Ref environment
+        - Key: 'InstanceType'
+          Value: !Ref instancetype
+        - Key: 'KeyName'
+          Value: !Ref keyname
+Outputs:
+  newInstanceId:
+    Description: 'ID of new instance'
+    Value: !Ref STANDALONEBOX
