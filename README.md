@@ -1,5 +1,14 @@
-# OTP Generator
+# RMIT Capstone Project - OTP Generator
 ---
+
+Collaborators:
+- Sok Ang Ho
+- Tina Te
+- Adithya Gadiraju
+- Harris Hall
+- Marina Gawrguos
+- Christina Terranova
+- James Ng
 
 ## Local setup
 
