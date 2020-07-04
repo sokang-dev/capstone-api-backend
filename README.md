@@ -1,4 +1,4 @@
-# RMIT Capstone Project - OTP Generator
+# RMIT Capstone Project - OTP Generator Backend
 ---
 
 Collaborators:
